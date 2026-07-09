@@ -1659,7 +1659,7 @@
                 for (let i = 0; i < checkedBoxes.length; i++) {
                     const cb = checkedBoxes[i];
                     const tr = cb.closest('tr');
-                    const currentAppId = tr.getAttribute('data-appid'); // Ensure we get the exact ID for this row
+                    const currentAppId = tr.getAttribute('data-appid'); 
                     
                     // Find the original data in memory
                     const originalData = window.currentApplications.find(r => r.applicationId === currentAppId);
@@ -1673,29 +1673,46 @@
                     lucide.createIcons({ root: btn });
 
                     try {
+                        // 1. GENERATE UNIQUE URLs TO PREVENT GHOST-CACHING!
+                        const uniqueTimestamp = Date.now();
+                        const finalFetchUrl = `${FINAL_SCRIPT_URL}?t=${uniqueTimestamp}&uid=${currentAppId}`;
+                        const pendingFetchUrl = `${PENDING_SCRIPT_URL}?t=${uniqueTimestamp}&uid=${currentAppId}`;
+
+                        // 2. Strict Fetch Options
+                        const fetchOptions = (bodyPayload) => ({
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                            cache: 'no-store', // Absolutely NO caching
+                            body: JSON.stringify(bodyPayload)
+                        });
+
                         if (actionType === 'approve') {
                             payloadData.action = 'approve_student';
                             payloadData.token = ADMIN_SECRET;
                             
-                            // 1. Send to Final DB (Emails student)
-                            const fRes = await fetch(FINAL_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payloadData) });
+                            // Send to Final DB (Emails student)
+                            const fRes = await fetch(finalFetchUrl, fetchOptions(payloadData));
                             const fResult = await fRes.json();
                             if (fResult.status !== 'success') throw new Error(fResult.message);
                             
-                            // 2. Mark as Approved in Pending DB
-                            await fetch(PENDING_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'delete_pending', token: ADMIN_SECRET, appId: currentAppId }) });
+                            // Mark as Approved in Pending DB
+                            await fetch(pendingFetchUrl, fetchOptions({ action: 'delete_pending', token: ADMIN_SECRET, appId: currentAppId }));
                             
-                            // 3. Update local memory safely
+                            // Optimistically update local memory
                             originalData.status = 'Approved';
                             
-                        } else { // Reject logic
-                            const rRes = await fetch(PENDING_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'reject_application', token: ADMIN_SECRET, appId: currentAppId }) });
+                        } else { 
+                            // Reject logic
+                            const rRes = await fetch(pendingFetchUrl, fetchOptions({ action: 'reject_application', token: ADMIN_SECRET, appId: currentAppId }));
                             const rResult = await rRes.json();
                             if (rResult.status !== 'success') throw new Error(rResult.message);
                             
-                            // Update local memory safely
                             originalData.status = 'Rejected';
                         }
+
+                        // 3. Add a 600ms delay to let the network connection reset
+                        await new Promise(resolve => setTimeout(resolve, 600));
+
                     } catch (e) {
                         console.error(`Error processing ${currentAppId}:`, e);
                     }
