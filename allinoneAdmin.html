@@ -1659,10 +1659,14 @@
                 for (let i = 0; i < checkedBoxes.length; i++) {
                     const cb = checkedBoxes[i];
                     const tr = cb.closest('tr');
-                    const appId = tr.getAttribute('data-appid');
-                    const data = window.currentApplications.find(r => r.applicationId === appId);
+                    const currentAppId = tr.getAttribute('data-appid'); // Ensure we get the exact ID for this row
                     
-                    if (!data) continue;
+                    // Find the original data in memory
+                    const originalData = window.currentApplications.find(r => r.applicationId === currentAppId);
+                    if (!originalData) continue;
+
+                    // DEEP COPY THE DATA so we don't accidentally corrupt the memory reference!
+                    const payloadData = JSON.parse(JSON.stringify(originalData));
 
                     // Update UI Progress Bar
                     btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 spin"></i> Processing ${i + 1} of ${checkedBoxes.length}...`;
@@ -1670,30 +1674,30 @@
 
                     try {
                         if (actionType === 'approve') {
-                            data.action = 'approve_student';
-                            data.token = ADMIN_SECRET;
+                            payloadData.action = 'approve_student';
+                            payloadData.token = ADMIN_SECRET;
                             
                             // 1. Send to Final DB (Emails student)
-                            const fRes = await fetch(FINAL_SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+                            const fRes = await fetch(FINAL_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payloadData) });
                             const fResult = await fRes.json();
                             if (fResult.status !== 'success') throw new Error(fResult.message);
                             
                             // 2. Mark as Approved in Pending DB
-                            await fetch(PENDING_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'delete_pending', token: ADMIN_SECRET, appId: appId }) });
+                            await fetch(PENDING_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'delete_pending', token: ADMIN_SECRET, appId: currentAppId }) });
                             
-                            // 3. Optimistically update local memory
-                            data.status = 'Approved';
+                            // 3. Update local memory safely
+                            originalData.status = 'Approved';
                             
                         } else { // Reject logic
-                            const rRes = await fetch(PENDING_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'reject_application', token: ADMIN_SECRET, appId: appId }) });
+                            const rRes = await fetch(PENDING_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'reject_application', token: ADMIN_SECRET, appId: currentAppId }) });
                             const rResult = await rRes.json();
                             if (rResult.status !== 'success') throw new Error(rResult.message);
                             
-                            // Optimistically update local memory
-                            data.status = 'Rejected';
+                            // Update local memory safely
+                            originalData.status = 'Rejected';
                         }
                     } catch (e) {
-                        console.error(`Error processing ${appId}:`, e);
+                        console.error(`Error processing ${currentAppId}:`, e);
                     }
                 }
 
