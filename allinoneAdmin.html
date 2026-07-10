@@ -1673,16 +1673,20 @@
                     lucide.createIcons({ root: btn });
 
                     try {
-                        // 1. GENERATE UNIQUE URLs TO PREVENT GHOST-CACHING!
-                        const uniqueTimestamp = Date.now();
-                        const finalFetchUrl = `${FINAL_SCRIPT_URL}?t=${uniqueTimestamp}&uid=${currentAppId}`;
-                        const pendingFetchUrl = `${PENDING_SCRIPT_URL}?t=${uniqueTimestamp}&uid=${currentAppId}`;
+                        // 1. HEAVY CACHE BUSTING: Force a radically unique URL every time to prevent Google V8 Container Bleed
+                        const uniqueNonce = Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+                        const finalFetchUrl = `${FINAL_SCRIPT_URL}?action=${actionType}&uid=${currentAppId}&nonce=${uniqueNonce}`;
+                        const pendingFetchUrl = `${PENDING_SCRIPT_URL}?action=${actionType}&uid=${currentAppId}&nonce=${uniqueNonce}`;
 
-                        // 2. Strict Fetch Options
+                        // 2. Strict Anti-Caching Network Headers
                         const fetchOptions = (bodyPayload) => ({
                             method: 'POST',
-                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                            cache: 'no-store', // Absolutely NO caching
+                            headers: { 
+                                'Content-Type': 'text/plain;charset=utf-8',
+                                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                                'Pragma': 'no-cache',
+                                'Expires': '0'
+                            },
                             body: JSON.stringify(bodyPayload)
                         });
 
@@ -1701,17 +1705,17 @@
                             // Optimistically update local memory
                             originalData.status = 'Approved';
                             
-                        } else { 
-                            // Reject logic
+                        } else { // Reject logic
                             const rRes = await fetch(pendingFetchUrl, fetchOptions({ action: 'reject_application', token: ADMIN_SECRET, appId: currentAppId }));
                             const rResult = await rRes.json();
                             if (rResult.status !== 'success') throw new Error(rResult.message);
                             
+                            // Optimistically update local memory
                             originalData.status = 'Rejected';
                         }
 
-                        // 3. Add a 600ms delay to let the network connection reset
-                        await new Promise(resolve => setTimeout(resolve, 600));
+                        // 3. INCREASED DELAY: 1.5 Seconds to let Google Apps Script fully clear its memory container
+                        await new Promise(resolve => setTimeout(resolve, 1500));
 
                     } catch (e) {
                         console.error(`Error processing ${currentAppId}:`, e);
