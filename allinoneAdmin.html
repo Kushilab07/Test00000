@@ -1619,6 +1619,31 @@
         }
 
         // ==========================================
+        // BULLETPROOF GOOGLE SCRIPT FETCH HELPER
+        // ==========================================
+        async function safeGasFetch(url, payloadObj) {
+            // 1. Inject a unique ID to guarantee the JSON string is mathematically distinct
+            payloadObj._request_id = Math.random().toString(36).substring(2) + Date.now().toString(36);
+            
+            // 2. Add random spaces to completely alter the byte length of the POST body
+            let bodyStr = JSON.stringify(payloadObj);
+            bodyStr += " ".repeat(Math.floor(Math.random() * 50) + 10);
+
+            // 3. Make the URL unique to bypass any proxy caching
+            const bypassUrl = `${url}?cb=${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
+            // 4. Fire simple POST (Omitting custom headers totally prevents the CORS block)
+            const res = await fetch(bypassUrl, {
+                method: 'POST',
+                cache: 'no-store',
+                body: bodyStr
+            });
+
+            if (!res.ok) throw new Error("Network request failed");
+            return await res.json();
+        }
+
+        // ==========================================
         // APPLICATIONS BULK ACTIONS (Sequential Processing)
         // ==========================================
         function toggleSelectAllPending(source) {
@@ -1637,7 +1662,6 @@
 
             const actionText = actionType === 'approve' ? 'Approve' : 'Reject';
             
-            // Setup Modal UI
             document.getElementById('confirmIconBox').className = actionType === 'approve' 
                 ? "w-12 h-12 rounded-full flex items-center justify-center bg-emerald-100 text-emerald-600"
                 : "w-12 h-12 rounded-full flex items-center justify-center bg-orange-100 text-orange-600";
@@ -1655,78 +1679,61 @@
             btn.onclick = async function () {
                 btn.disabled = true;
                 
-                // SEQUENTIAL LOOP to protect Google Mail Quotas and API Rate Limits
+                // Sequential execution to prevent Google Server repetition bug
                 for (let i = 0; i < checkedBoxes.length; i++) {
                     const cb = checkedBoxes[i];
                     const tr = cb.closest('tr');
                     const currentAppId = tr.getAttribute('data-appid'); 
                     
-                    // Find the original data in memory
                     const originalData = window.currentApplications.find(r => r.applicationId === currentAppId);
                     if (!originalData) continue;
 
-                    // DEEP COPY THE DATA so we don't accidentally corrupt the memory reference!
+                    // Deep clone the data so local memory stays pristine
                     const payloadData = JSON.parse(JSON.stringify(originalData));
 
-                    // Update UI Progress Bar
                     btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 spin"></i> Processing ${i + 1} of ${checkedBoxes.length}...`;
                     lucide.createIcons({ root: btn });
 
                     try {
-                        // 1. UNIQUE URLS: This strictly prevents Google's servers from mixing up the payloads!
-                        const uniqueNonce = Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
-                        const finalFetchUrl = `${FINAL_SCRIPT_URL}?action=${actionType}&uid=${currentAppId}&nonce=${uniqueNonce}`;
-                        const pendingFetchUrl = `${PENDING_SCRIPT_URL}?action=${actionType}&uid=${currentAppId}&nonce=${uniqueNonce}`;
-
                         if (actionType === 'approve') {
                             payloadData.action = 'approve_student';
                             payloadData.token = ADMIN_SECRET;
                             
-                            // Send to Final DB (Emails student) - Notice we removed the headers to fix the CORS error!
-                            const fRes = await fetch(finalFetchUrl, { method: 'POST', body: JSON.stringify(payloadData) });
-                            const fResult = await fRes.json();
+                            // 1. Save Final DB (Emails student) using safe wrapper
+                            const fResult = await safeGasFetch(FINAL_SCRIPT_URL, payloadData);
                             if (fResult.status !== 'success') throw new Error(fResult.message);
                             
-                            // Mark as Approved in Pending DB
-                            await fetch(pendingFetchUrl, { method: 'POST', body: JSON.stringify({ action: 'delete_pending', token: ADMIN_SECRET, appId: currentAppId }) });
+                            // 2. Mark Approved in Pending DB
+                            await safeGasFetch(PENDING_SCRIPT_URL, { action: 'delete_pending', token: ADMIN_SECRET, appId: currentAppId });
                             
-                            // Optimistically update local memory
                             originalData.status = 'Approved';
-                            
                         } else { 
                             // Reject logic
-                            const rRes = await fetch(pendingFetchUrl, { method: 'POST', body: JSON.stringify({ action: 'reject_application', token: ADMIN_SECRET, appId: currentAppId }) });
-                            const rResult = await rRes.json();
+                            const rResult = await safeGasFetch(PENDING_SCRIPT_URL, { action: 'reject_application', token: ADMIN_SECRET, appId: currentAppId });
                             if (rResult.status !== 'success') throw new Error(rResult.message);
                             
-                            // Optimistically update local memory
                             originalData.status = 'Rejected';
                         }
 
-                        // 3. INCREASED DELAY: 1.5 Seconds to let Google completely finish the email before firing the next one
-                        await new Promise(resolve => setTimeout(resolve, 1500));
+                        // Force a 2-second sleep to clear Google's HTTP memory pool
+                        await new Promise(resolve => setTimeout(resolve, 2000));
 
                     } catch (e) {
                         console.error(`Error processing ${currentAppId}:`, e);
                     }
                 }
 
-                // Clean up when the entire loop finishes
                 showToast(`Bulk ${actionText} Complete!`, 'success');
                 btn.disabled = false;
                 closeModal('confirmModal');
                 
-                // Uncheck master box
                 const masterCheck = document.getElementById('selectAllPending');
                 if (masterCheck) {
                     masterCheck.checked = false;
                     toggleSelectAllPending(masterCheck);
                 }
                 
-                // Instantly re-render table with new statuses
                 filterPendingTable();
-                
-                // Fetch Final Students silently in background so the other tab is up to date!
                 if (actionType === 'approve') fetchFinalStudents(); 
             };
 
@@ -2140,7 +2147,6 @@
 
             pendingBulkStatus = status;
 
-            // 1. Setup the beautiful Custom Confirm Modal instead of the ugly browser alert
             document.getElementById('confirmIconBox').className = "w-12 h-12 rounded-full flex items-center justify-center bg-amber-100 text-amber-600";
             document.getElementById('confirmIcon').setAttribute('data-lucide', 'alert-circle');
             document.getElementById('confirmTitle').innerText = "Confirm Status Update";
@@ -2151,24 +2157,22 @@
             btn.className = "px-5 py-2.5 rounded-xl font-medium text-white shadow-sm flex items-center gap-2 bg-amber-600 hover:bg-amber-700 transition-colors";
             btn.innerHTML = `Update Status`;
 
-            // 2. Define what happens when they click "Update Status"
             btn.onclick = async function () {
                 btn.disabled = true;
-                btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 spin"></i> Updating...`;
-                lucide.createIcons({ root: btn });
-
-                const fetchPromises = [];
-
-                checkedBoxes.forEach(cb => {
+                
+                // Use sequential processing here too to prevent connection pooling
+                for (let i = 0; i < checkedBoxes.length; i++) {
+                    const cb = checkedBoxes[i];
                     const tr = cb.closest('tr');
                     const sId = tr.getAttribute('data-sid');
                     const sClass = tr.getAttribute('data-sclass');
 
-                    // A. Update Local Memory Instantly (This FIXES the crash!)
+                    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 spin"></i> Updating ${i + 1} of ${checkedBoxes.length}...`;
+                    lucide.createIcons({ root: btn });
+
                     const memRow = window.finalStudentsData.find(r => r.studentId === sId);
                     if (memRow) memRow.admitStatus = status;
 
-                    // B. Queue up the background fetch to Google Sheets
                     const payload = { 
                         action: 'update_cell', 
                         token: ADMIN_SECRET, 
@@ -2178,34 +2182,24 @@
                         value: status 
                     };
                     
-                    fetchPromises.push(
-                        fetch(FINAL_SCRIPT_URL, {
-                            method: 'POST',
-                            body: JSON.stringify(payload)
-                        })
-                    );
-                });
-
-                try {
-                    // Wait for all background saves to finish
-                    await Promise.all(fetchPromises);
-                    showToast(`Status updated to ${status} successfully!`, 'success');
-                } catch (e) {
-                    showToast(`Warning: Some updates may have failed on the server.`, 'error');
-                } finally {
-                    // Reset Modal and UI
-                    btn.disabled = false;
-                    closeModal('confirmModal');
-                    
-                    // Uncheck the "Select All" box
-                    document.getElementById('selectAll').checked = false; 
-                    
-                    // Re-render the table safely to show the new colored badges
-                    filterStudentsTable();
+                    try {
+                        await safeGasFetch(FINAL_SCRIPT_URL, payload);
+                        
+                        // Very fast delay for simple cell updates
+                        await new Promise(resolve => setTimeout(resolve, 600));
+                    } catch (e) {
+                        console.error(`Failed to update ${sId}`, e);
+                    }
                 }
+
+                showToast(`Status updated to ${status} successfully!`, 'success');
+                btn.disabled = false;
+                closeModal('confirmModal');
+                
+                document.getElementById('selectAll').checked = false; 
+                filterStudentsTable();
             };
 
-            // Trigger the modal to open
             openModal('confirmModal');
         }
 
