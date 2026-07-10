@@ -1673,40 +1673,29 @@
                     lucide.createIcons({ root: btn });
 
                     try {
-                        // 1. HEAVY CACHE BUSTING: Force a radically unique URL every time to prevent Google V8 Container Bleed
+                        // 1. UNIQUE URLS: This strictly prevents Google's servers from mixing up the payloads!
                         const uniqueNonce = Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
                         const finalFetchUrl = `${FINAL_SCRIPT_URL}?action=${actionType}&uid=${currentAppId}&nonce=${uniqueNonce}`;
                         const pendingFetchUrl = `${PENDING_SCRIPT_URL}?action=${actionType}&uid=${currentAppId}&nonce=${uniqueNonce}`;
-
-                        // 2. Strict Anti-Caching Network Headers
-                        const fetchOptions = (bodyPayload) => ({
-                            method: 'POST',
-                            headers: { 
-                                'Content-Type': 'text/plain;charset=utf-8',
-                                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                                'Pragma': 'no-cache',
-                                'Expires': '0'
-                            },
-                            body: JSON.stringify(bodyPayload)
-                        });
 
                         if (actionType === 'approve') {
                             payloadData.action = 'approve_student';
                             payloadData.token = ADMIN_SECRET;
                             
-                            // Send to Final DB (Emails student)
-                            const fRes = await fetch(finalFetchUrl, fetchOptions(payloadData));
+                            // Send to Final DB (Emails student) - Notice we removed the headers to fix the CORS error!
+                            const fRes = await fetch(finalFetchUrl, { method: 'POST', body: JSON.stringify(payloadData) });
                             const fResult = await fRes.json();
                             if (fResult.status !== 'success') throw new Error(fResult.message);
                             
                             // Mark as Approved in Pending DB
-                            await fetch(pendingFetchUrl, fetchOptions({ action: 'delete_pending', token: ADMIN_SECRET, appId: currentAppId }));
+                            await fetch(pendingFetchUrl, { method: 'POST', body: JSON.stringify({ action: 'delete_pending', token: ADMIN_SECRET, appId: currentAppId }) });
                             
                             // Optimistically update local memory
                             originalData.status = 'Approved';
                             
-                        } else { // Reject logic
-                            const rRes = await fetch(pendingFetchUrl, fetchOptions({ action: 'reject_application', token: ADMIN_SECRET, appId: currentAppId }));
+                        } else { 
+                            // Reject logic
+                            const rRes = await fetch(pendingFetchUrl, { method: 'POST', body: JSON.stringify({ action: 'reject_application', token: ADMIN_SECRET, appId: currentAppId }) });
                             const rResult = await rRes.json();
                             if (rResult.status !== 'success') throw new Error(rResult.message);
                             
@@ -1714,7 +1703,7 @@
                             originalData.status = 'Rejected';
                         }
 
-                        // 3. INCREASED DELAY: 1.5 Seconds to let Google Apps Script fully clear its memory container
+                        // 3. INCREASED DELAY: 1.5 Seconds to let Google completely finish the email before firing the next one
                         await new Promise(resolve => setTimeout(resolve, 1500));
 
                     } catch (e) {
