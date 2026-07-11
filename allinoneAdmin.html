@@ -1662,6 +1662,7 @@
 
             const actionText = actionType === 'approve' ? 'Approve' : 'Reject';
             
+            // Setup Modal UI
             document.getElementById('confirmIconBox').className = actionType === 'approve' 
                 ? "w-12 h-12 rounded-full flex items-center justify-center bg-emerald-100 text-emerald-600"
                 : "w-12 h-12 rounded-full flex items-center justify-center bg-orange-100 text-orange-600";
@@ -1679,7 +1680,7 @@
             btn.onclick = async function () {
                 btn.disabled = true;
                 
-                // Sequential execution to prevent Google Server repetition bug
+                // SEQUENTIAL LOOP to protect Google Mail Quotas and API Rate Limits
                 for (let i = 0; i < checkedBoxes.length; i++) {
                     const cb = checkedBoxes[i];
                     const tr = cb.closest('tr');
@@ -1688,52 +1689,90 @@
                     const originalData = window.currentApplications.find(r => r.applicationId === currentAppId);
                     if (!originalData) continue;
 
-                    // Deep clone the data so local memory stays pristine
+                    // Deep clone the data
                     const payloadData = JSON.parse(JSON.stringify(originalData));
 
                     btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 spin"></i> Processing ${i + 1} of ${checkedBoxes.length}...`;
                     lucide.createIcons({ root: btn });
 
                     try {
+                        // THE FIX: "Payload Padding" & Unique IDs
+                        // We generate a totally random string of spaces to drastically change the byte-size of the request.
+                        // This mathematically forces Google's load balancer to realize it's a NEW request and drop the cached body of the previous student!
+                        const uniqueId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+                        const paddingSpaces = " ".repeat(Math.floor(Math.random() * 500) + 100);
+
+                        // Attach unique parameters to the URL to bypass browser cache
+                        const finalFetchUrl = `${FINAL_SCRIPT_URL}?req=${uniqueId}`;
+                        const pendingFetchUrl = `${PENDING_SCRIPT_URL}?req=${uniqueId}`;
+
                         if (actionType === 'approve') {
                             payloadData.action = 'approve_student';
                             payloadData.token = ADMIN_SECRET;
+                            payloadData._req_id = uniqueId; // Ensure JSON object is also uniquely mutated
                             
-                            // 1. Save Final DB (Emails student) using safe wrapper
-                            const fResult = await safeGasFetch(FINAL_SCRIPT_URL, payloadData);
+                            // Pad the JSON string with our random spaces
+                            const finalBodyStr = JSON.stringify(payloadData) + paddingSpaces;
+                            
+                            // Send to Final DB (Emails student) using browser-level cache busting (no-store)
+                            const fRes = await fetch(finalFetchUrl, { 
+                                method: 'POST', 
+                                cache: 'no-store', 
+                                body: finalBodyStr 
+                            });
+                            const fResult = await fRes.json();
                             if (fResult.status !== 'success') throw new Error(fResult.message);
                             
-                            // 2. Mark Approved in Pending DB
-                            await safeGasFetch(PENDING_SCRIPT_URL, { action: 'delete_pending', token: ADMIN_SECRET, appId: currentAppId });
+                            // Mark as Approved in Pending DB
+                            const pendingBodyStr = JSON.stringify({ action: 'delete_pending', token: ADMIN_SECRET, appId: currentAppId, _req_id: uniqueId }) + paddingSpaces;
+                            await fetch(pendingFetchUrl, { 
+                                method: 'POST', 
+                                cache: 'no-store', 
+                                body: pendingBodyStr 
+                            });
                             
+                            // Optimistically update local memory
                             originalData.status = 'Approved';
+                            
                         } else { 
                             // Reject logic
-                            const rResult = await safeGasFetch(PENDING_SCRIPT_URL, { action: 'reject_application', token: ADMIN_SECRET, appId: currentAppId });
+                            const rejectBodyStr = JSON.stringify({ action: 'reject_application', token: ADMIN_SECRET, appId: currentAppId, _req_id: uniqueId }) + paddingSpaces;
+                            const rRes = await fetch(pendingFetchUrl, { 
+                                method: 'POST', 
+                                cache: 'no-store', 
+                                body: rejectBodyStr 
+                            });
+                            const rResult = await rRes.json();
                             if (rResult.status !== 'success') throw new Error(rResult.message);
                             
                             originalData.status = 'Rejected';
                         }
 
-                        // Force a 2-second sleep to clear Google's HTTP memory pool
-                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        // Cooldown to ensure the network connection severs cleanly before the next loop
+                        await new Promise(resolve => setTimeout(resolve, 1500));
 
                     } catch (e) {
                         console.error(`Error processing ${currentAppId}:`, e);
+                        showToast(`Failed on ${currentAppId}. Continuing...`, 'error');
                     }
                 }
 
+                // Clean up when the entire loop finishes
                 showToast(`Bulk ${actionText} Complete!`, 'success');
                 btn.disabled = false;
                 closeModal('confirmModal');
                 
+                // Uncheck master box
                 const masterCheck = document.getElementById('selectAllPending');
                 if (masterCheck) {
                     masterCheck.checked = false;
                     toggleSelectAllPending(masterCheck);
                 }
                 
+                // Instantly re-render table with new statuses
                 filterPendingTable();
+                
+                // Fetch Final Students silently in background so the other tab is up to date!
                 if (actionType === 'approve') fetchFinalStudents(); 
             };
 
