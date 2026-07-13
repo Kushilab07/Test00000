@@ -282,7 +282,7 @@
                 </div>
                 <div
                     class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-[0.98]">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Daily Mail Quota</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Daily Review Quota</p>
                     <div class="flex items-end gap-2 mb-2">
                         <p id="statQuotaUsed" class="text-3xl font-bold text-blue-600 dark:text-blue-400">0</p>
                         <p class="text-sm font-medium text-slate-500 mb-1">/ 80</p>
@@ -329,30 +329,29 @@
             <!-- 2. Toolbar Row -->
             <div
                 class="flex flex-col lg:flex-row items-start lg:items-center gap-3 mb-6 w-full flex-wrap flex-shrink-0">
-                <div class="flex items-center gap-2 w-full lg:w-auto">
-                    <div
-                        class="flex flex-1 lg:flex-none bg-slate-100 dark:bg-slate-800/80 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700">
-                        <button onclick="setPendingFilter('All', this)"
-                            class="app-filter-btn flex-1 lg:flex-none px-1.5 sm:px-2 lg:px-4 py-1.5 text-[11px] sm:text-xs lg:text-sm font-medium rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">All</button>
-                        <button onclick="setPendingFilter('Pending', this)"
-                            class="app-filter-btn flex-1 lg:flex-none px-1.5 sm:px-2 lg:px-4 py-1.5 text-[11px] sm:text-xs lg:text-sm font-medium rounded-lg bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border border-slate-200 dark:border-slate-700 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">Pending</button>
-                        <button onclick="setPendingFilter('Approved', this)"
-                            class="app-filter-btn flex-1 lg:flex-none px-1.5 sm:px-2 lg:px-4 py-1.5 text-[11px] sm:text-xs lg:text-sm font-medium rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">Approved</button>
-                        <button onclick="setPendingFilter('Rejected', this)"
-                            class="app-filter-btn flex-1 lg:flex-none px-1.5 sm:px-2 lg:px-4 py-1.5 text-[11px] sm:text-xs lg:text-sm font-medium rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">Rejected</button>
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+    
+                    <div class="flex flex-1 lg:flex-none bg-slate-100 dark:bg-slate-800/80 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <button onclick="setPendingFilter('All', this)" class="app-filter-btn flex-1 lg:flex-none px-1.5 sm:px-2 lg:px-4 py-1.5 text-[11px] sm:text-xs lg:text-sm font-medium rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">All</button>
+                        <button onclick="setPendingFilter('Pending', this)" class="app-filter-btn flex-1 lg:flex-none px-1.5 sm:px-2 lg:px-4 py-1.5 text-[11px] sm:text-xs lg:text-sm font-medium rounded-lg bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border border-slate-200 dark:border-slate-700 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">Pending</button>
+                        <button onclick="setPendingFilter('Approved', this)" class="app-filter-btn flex-1 lg:flex-none px-1.5 sm:px-2 lg:px-4 py-1.5 text-[11px] sm:text-xs lg:text-sm font-medium rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">Approved</button>
+                        <button onclick="setPendingFilter('Rejected', this)" class="app-filter-btn flex-1 lg:flex-none px-1.5 sm:px-2 lg:px-4 py-1.5 text-[11px] sm:text-xs lg:text-sm font-medium rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">Rejected</button>
                     </div>
-
-                    <button onclick="bulkPendingAction('approve')"
-                        class="px-3 py-1.5 text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 hidden bulk-pending-btn transition-colors">Approve
-                        Selected</button>
-                    <button onclick="bulkPendingAction('reject')"
-                        class="px-3 py-1.5 text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200 rounded-lg hover:bg-orange-100 hidden bulk-pending-btn transition-colors">Reject
-                        Selected</button>
-
-                    <button onclick="openUniversalDeleteModal('pending')"
-                        class="shrink-0 flex items-center justify-center bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 p-2 lg:p-2.5 rounded-xl transition-colors"
-                        title="Delete ALL Pending Applications"><i data-lucide="trash-2"
-                            class="w-4 h-4 lg:w-5 lg:h-5"></i></button>
+                
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end sm:justify-start">
+                        
+                        <button onclick="bulkPendingAction('approve')"
+                            class="px-2 py-1.5 text-[11px] sm:px-3 sm:py-1.5 sm:text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 hidden bulk-pending-btn transition-colors">Approve Selected</button>
+                        
+                        <button onclick="bulkPendingAction('reject')"
+                            class="px-2 py-1.5 text-[11px] sm:px-3 sm:py-1.5 sm:text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200 rounded-lg hover:bg-orange-100 hidden bulk-pending-btn transition-colors">Reject Selected</button>
+                
+                        <button onclick="openUniversalDeleteModal('pending')"
+                            class="shrink-0 flex items-center justify-center bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 p-1.5 sm:p-2 lg:p-2.5 rounded-xl transition-colors"
+                            title="Delete ALL Pending Applications"><i data-lucide="trash-2"
+                                class="w-4 h-4 lg:w-5 lg:h-5"></i></button>
+                    </div>
+                    
                 </div>
 
                 <div class="flex items-center gap-3 w-full lg:w-auto lg:ml-auto mt-2 lg:mt-0">
@@ -1709,14 +1708,62 @@
         // ==========================================
         // NEW: BULK PENDING PROCESSING CONTROLLERS
         // ==========================================
+        // NEW: Intercepts individual clicks to enforce the limit
+        function handleIndividualPendingCheck(checkbox) {
+            if (currentAppFilter === 'All' || currentAppFilter === 'Pending') {
+                const checkedBoxes = document.querySelectorAll('.pending-checkbox:checked');
+                if (checkedBoxes.length > 20) {
+                    checkbox.checked = false; // Immediately uncheck it
+                    showToast('Limit Reached: You can only select up to 20 applications at a time.', 'error');
+                }
+            }
+            toggleBulkPendingButtons();
+        }
+
+        // UPDATED: "Select All" now respects the tab limit
         function toggleSelectAllPending(source) {
-            document.querySelectorAll('.pending-checkbox').forEach(cb => cb.checked = source.checked);
+            const checkboxes = document.querySelectorAll('.pending-checkbox');
+            
+            if (source.checked) {
+                if (currentAppFilter === 'All' || currentAppFilter === 'Pending') {
+                    let checkedCount = 0;
+                    checkboxes.forEach(cb => {
+                        if (checkedCount < 20) {
+                            cb.checked = true;
+                            checkedCount++;
+                        } else {
+                            cb.checked = false;
+                        }
+                    });
+                    
+                    if (checkboxes.length > 20) {
+                        showToast('Auto-limited to the first 20 applications.', 'info');
+                    }
+                } else {
+                    // On Approved or Rejected tabs, select them all without limits
+                    checkboxes.forEach(cb => cb.checked = true);
+                }
+            } else {
+                // If turning off "Select All", wipe everything
+                checkboxes.forEach(cb => cb.checked = false);
+            }
+            
             toggleBulkPendingButtons();
         }
 
         function toggleBulkPendingButtons() {
             const anyChecked = document.querySelectorAll('.pending-checkbox:checked').length > 0;
-            document.querySelectorAll('.bulk-pending-btn').forEach(btn => anyChecked ? btn.classList.remove('hidden') : btn.classList.add('hidden'));
+            
+            // NEW: Only allow the buttons to appear if we are on the 'All' or 'Pending' tabs.
+            const isAllowedTab = (currentAppFilter === 'All' || currentAppFilter === 'Pending');
+            
+            document.querySelectorAll('.bulk-pending-btn').forEach(btn => {
+                if (anyChecked && isAllowedTab) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            });
         }
 
         function bulkPendingAction(type) {
@@ -1871,11 +1918,10 @@
 
                 const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors";
                 tr.setAttribute('data-appid', row.applicationId);
-                // Check if row is currently in a state that permits bulk checking
-                const isPending = (row.status === 'Pending' || !row.status);
-                const checkboxCell = isPending
-                    ? `<td class="px-4 py-3 text-center sticky left-0 z-10 bg-white dark:bg-slate-900 shadow-[4px_0_10px_rgba(0,0,0,0.04)] border-r border-slate-100 dark:border-slate-800"><input type="checkbox" onchange="toggleBulkPendingButtons()" class="pending-checkbox rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"></td>`
-                    : `<td class="px-4 py-3 text-center sticky left-0 z-10 bg-white dark:bg-slate-900 shadow-[4px_0_10px_rgba(0,0,0,0.04)] border-r border-slate-100 dark:border-slate-800 text-slate-300 dark:text-slate-700">—</td>`;
+                // UPDATED: Checkboxes now appear on ALL rows so your tab rules work correctly, 
+                // and they use the new handleIndividualPendingCheck function.
+                const currentStatus = row.status || 'Pending';
+                const checkboxCell = `<td class="px-4 py-3 text-center sticky left-0 z-10 bg-white dark:bg-slate-900 shadow-[4px_0_10px_rgba(0,0,0,0.04)] border-r border-slate-100 dark:border-slate-800"><input type="checkbox" onchange="handleIndividualPendingCheck(this)" data-status="${currentStatus}" class="pending-checkbox rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"></td>`;
 
                 tr.innerHTML = `
                     ${checkboxCell}
