@@ -338,13 +338,13 @@
                         <button onclick="setPendingFilter('Rejected', this)" class="app-filter-btn flex-1 lg:flex-none px-1.5 sm:px-2 lg:px-4 py-1.5 text-[11px] sm:text-xs lg:text-sm font-medium rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">Rejected</button>
                     </div>
                 
-                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end sm:justify-start">
-                        
+                    <div id="pendingActionsWrapper" class="flex items-center gap-2 w-auto sm:w-auto justify-end sm:justify-start transition-all duration-300">
+        
                         <button onclick="bulkPendingAction('approve')"
-                            class="px-2 py-1.5 text-[11px] sm:px-3 sm:py-1.5 sm:text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 hidden bulk-pending-btn transition-colors">Approve Selected</button>
+                            class="px-2 py-1.5 text-[11px] sm:px-3 sm:py-1.5 sm:text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 hidden bulk-pending-btn transition-colors flex-1 sm:flex-none">Approve Selected</button>
                         
                         <button onclick="bulkPendingAction('reject')"
-                            class="px-2 py-1.5 text-[11px] sm:px-3 sm:py-1.5 sm:text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200 rounded-lg hover:bg-orange-100 hidden bulk-pending-btn transition-colors">Reject Selected</button>
+                            class="px-2 py-1.5 text-[11px] sm:px-3 sm:py-1.5 sm:text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200 rounded-lg hover:bg-orange-100 hidden bulk-pending-btn transition-colors flex-1 sm:flex-none">Reject Selected</button>
                 
                         <button onclick="openUniversalDeleteModal('pending')"
                             class="shrink-0 flex items-center justify-center bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 p-1.5 sm:p-2 lg:p-2.5 rounded-xl transition-colors"
@@ -1753,17 +1753,28 @@
 
         function toggleBulkPendingButtons() {
             const anyChecked = document.querySelectorAll('.pending-checkbox:checked').length > 0;
-            
-            // NEW: Only allow the buttons to appear if we are on the 'All' or 'Pending' tabs.
             const isAllowedTab = (currentAppFilter === 'All' || currentAppFilter === 'Pending');
+            const showBulk = anyChecked && isAllowedTab;
             
             document.querySelectorAll('.bulk-pending-btn').forEach(btn => {
-                if (anyChecked && isAllowedTab) {
+                if (showBulk) {
                     btn.classList.remove('hidden');
                 } else {
                     btn.classList.add('hidden');
                 }
             });
+
+            // NEW: Dynamically shift the wrapper to a new line on mobile when buttons appear
+            const actionWrapper = document.getElementById('pendingActionsWrapper');
+            if (actionWrapper) {
+                if (showBulk) {
+                    actionWrapper.classList.add('w-full');
+                    actionWrapper.classList.remove('w-auto');
+                } else {
+                    actionWrapper.classList.add('w-auto');
+                    actionWrapper.classList.remove('w-full');
+                }
+            }
         }
 
         function bulkPendingAction(type) {
