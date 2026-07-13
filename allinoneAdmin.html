@@ -317,7 +317,7 @@
             <!-- 2. Toolbar Row -->
             <div
                 class="flex flex-col lg:flex-row items-start lg:items-center gap-3 mb-6 w-full flex-wrap flex-shrink-0">
-                <div class="flex items-center gap-2 w-full lg:w-auto flex-wrap">
+                <div class="flex items-center gap-2 w-full lg:w-auto">
                     <div
                         class="flex flex-1 lg:flex-none bg-slate-100 dark:bg-slate-800/80 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700">
                         <button onclick="setPendingFilter('All', this)"
@@ -330,8 +330,12 @@
                             class="app-filter-btn flex-1 lg:flex-none px-1.5 sm:px-2 lg:px-4 py-1.5 text-[11px] sm:text-xs lg:text-sm font-medium rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">Rejected</button>
                     </div>
 
-                    <button onclick="bulkPendingAction('approve')" class="px-3 py-1.5 text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 hidden pending-bulk-btn transition-colors shadow-sm">Approve</button>
-                    <button onclick="bulkPendingAction('reject')" class="px-3 py-1.5 text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200 rounded-lg hover:bg-orange-100 hidden pending-bulk-btn transition-colors shadow-sm">Reject</button>
+                    <button onclick="bulkPendingAction('approve')"
+                        class="px-3 py-1.5 text-sm font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 hidden bulk-pending-btn transition-colors">Approve
+                        Selected</button>
+                    <button onclick="bulkPendingAction('reject')"
+                        class="px-3 py-1.5 text-sm font-medium bg-orange-50 text-orange-700 border border-orange-200 rounded-lg hover:bg-orange-100 hidden bulk-pending-btn transition-colors">Reject
+                        Selected</button>
 
                     <button onclick="openUniversalDeleteModal('pending')"
                         class="shrink-0 flex items-center justify-center bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 p-2 lg:p-2.5 rounded-xl transition-colors"
@@ -347,7 +351,7 @@
                             oninput="handlePendingSearch()"
                             class="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
-                    
+
                     <div class="relative">
                         <button onclick="document.getElementById('advFilterPanelPending').classList.toggle('hidden')"
                             class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"><i
@@ -355,15 +359,23 @@
                         <div id="advFilterPanelPending"
                             class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-4 z-50">
                             <h4 class="text-sm font-bold mb-3 dark:text-white">Advanced Filters</h4>
-                            
+
                             <label class="block text-xs font-medium text-slate-500 mb-1">Class</label>
                             <select id="filterPendingClass" onchange="filterPendingTable()"
                                 class="w-full mb-3 p-1.5 text-sm border rounded dark:bg-slate-900 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="All">All Classes</option>
-                                <option value="1">1</option> <option value="2">2</option> <option value="3">3</option>
-                                <option value="4">4</option> <option value="5">5</option> <option value="6">6</option>
-                                <option value="7">7</option> <option value="8">8</option> <option value="9">9</option>
-                                <option value="10">10</option> <option value="11">11</option> <option value="12">12</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
                             </select>
 
                             <label class="block text-xs font-medium text-slate-500 mb-1">Section</label>
@@ -376,7 +388,8 @@
                             </select>
 
                             <label class="block text-xs font-medium text-slate-500 mb-1">Roll No (Optional)</label>
-                            <input type="text" id="filterPendingRoll" oninput="handlePendingSearch()" placeholder="e.g. 05"
+                            <input type="text" id="filterPendingRoll" oninput="handlePendingSearch()"
+                                placeholder="e.g. 05"
                                 class="w-full p-1.5 text-sm border rounded dark:bg-slate-900 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
@@ -385,21 +398,29 @@
 
             <!-- 3. Table -->
             <!-- flex-shrink-0 is the secret here to let it grow vertically without getting squished by flexbox! -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-colors duration-300 relative mb-24 lg:mb-0 flex-shrink-0 lg:flex-shrink lg:flex-1 lg:min-h-0 flex flex-col">
-                
+            <div
+                class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-colors duration-300 relative mb-24 lg:mb-0 flex-shrink-0 lg:flex-shrink lg:flex-1 lg:min-h-0 flex flex-col">
+
                 <div class="overflow-x-auto lg:overflow-auto custom-scrollbar relative rounded-2xl pb-2 lg:flex-1">
                     <table class="w-full text-left border-collapse min-w-max">
-                        
-                        <thead class="bg-slate-50 dark:bg-slate-800/95 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm">
-                            <tr class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
-                                <th class="px-4 py-3 w-10 text-center sticky left-0 z-40 bg-slate-50 dark:bg-slate-800/95 shadow-[4px_0_10px_rgba(0,0,0,0.04)] border-r border-slate-200 dark:border-slate-800">
-                                    <input type="checkbox" id="selectAllPending" onclick="toggleSelectAllPending(this)" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800">
+
+                        <thead
+                            class="bg-slate-50 dark:bg-slate-800/95 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm">
+                            <tr
+                                class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
+                                <th
+                                    class="px-4 py-3 w-10 text-center sticky left-0 z-40 bg-slate-50 dark:bg-slate-800/95 shadow-[4px_0_10px_rgba(0,0,0,0.04)] border-r border-slate-200 dark:border-slate-800">
+                                    <input type="checkbox" id="selectAllPending" onclick="toggleSelectAllPending(this)"
+                                        class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800">
                                 </th>
                                 <th class="px-4 py-3">
                                     <div>Date & Time</div>
-                                    <div class="text-[10px] font-normal text-slate-400 normal-case mt-0.5 tracking-normal">DD/MM/YYYY</div>
+                                    <div
+                                        class="text-[10px] font-normal text-slate-400 normal-case mt-0.5 tracking-normal">
+                                        DD/MM/YYYY</div>
                                 </th>
-                                <th class="px-4 py-3 border-r border-slate-200 dark:border-slate-700">Application ID</th>
+                                <th class="px-4 py-3 border-r border-slate-200 dark:border-slate-700">Application ID
+                                </th>
                                 <th class="px-4 py-3">Student ID</th>
                                 <th class="px-4 py-3">Student Name</th>
                                 <th class="px-4 py-3">Class</th>
@@ -407,13 +428,17 @@
                                 <th class="px-4 py-3">Roll No</th>
                                 <th class="px-4 py-3">
                                     <div>Date of Birth</div>
-                                    <div class="text-[10px] font-normal text-slate-400 normal-case mt-0.5 tracking-normal">DD/MM/YYYY</div>
+                                    <div
+                                        class="text-[10px] font-normal text-slate-400 normal-case mt-0.5 tracking-normal">
+                                        DD/MM/YYYY</div>
                                 </th>
                                 <th class="px-4 py-3">Father's Name</th>
                                 <th class="px-4 py-3">Phone Number</th>
                                 <th class="px-4 py-3 border-r border-slate-200 dark:border-slate-800">Email ID</th>
-                                
-                                <th class="px-4 py-3 text-center sticky right-0 z-40 bg-slate-50 dark:bg-slate-800/95 shadow-[-4px_0_10px_rgba(0,0,0,0.04)] w-[120px]">Action</th>
+
+                                <th
+                                    class="px-4 py-3 text-center sticky right-0 z-40 bg-slate-50 dark:bg-slate-800/95 shadow-[-4px_0_10px_rgba(0,0,0,0.04)] w-[120px]">
+                                    Action</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
@@ -433,7 +458,8 @@
             </div>
         </div>
 
-        <div id="studentsView" class="flex-1 flex flex-col p-4 lg:p-8 overflow-y-auto lg:overflow-hidden scrollbar-hide">
+        <div id="studentsView"
+            class="flex-1 flex flex-col p-4 lg:p-8 overflow-y-auto lg:overflow-hidden scrollbar-hide">
             <!-- 1. Header Row -->
             <div class="flex items-start sm:items-center justify-between w-full mb-6 flex-shrink-0">
                 <div>
@@ -562,22 +588,29 @@
             </div>
 
             <!-- Full Page Scrolling Table Wrapper -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-colors duration-300 relative mb-24 lg:mb-0 flex-shrink-0 lg:flex-shrink lg:flex-1 lg:min-h-0 flex flex-col">
-                
+            <div
+                class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm transition-colors duration-300 relative mb-24 lg:mb-0 flex-shrink-0 lg:flex-shrink lg:flex-1 lg:min-h-0 flex flex-col">
+
                 <div class="overflow-x-auto lg:overflow-auto custom-scrollbar relative rounded-2xl pb-2 lg:flex-1">
                     <table class="w-full text-left border-collapse min-w-max" id="studentsTableElement">
-                        
-                        <thead class="bg-slate-50 dark:bg-slate-800/95 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm">
-                            <tr class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
-                                <th class="px-4 py-3 w-10 text-center sticky left-0 z-40 bg-slate-50 dark:bg-slate-800/95 shadow-[4px_0_10px_rgba(0,0,0,0.04)] border-r border-slate-200 dark:border-slate-800">
+
+                        <thead
+                            class="bg-slate-50 dark:bg-slate-800/95 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 shadow-sm">
+                            <tr
+                                class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
+                                <th
+                                    class="px-4 py-3 w-10 text-center sticky left-0 z-40 bg-slate-50 dark:bg-slate-800/95 shadow-[4px_0_10px_rgba(0,0,0,0.04)] border-r border-slate-200 dark:border-slate-800">
                                     <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"
                                         class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800">
                                 </th>
                                 <th class="px-4 py-3">
                                     <div>Date & Time</div>
-                                    <div class="text-[10px] font-normal text-slate-400 normal-case mt-0.5 tracking-normal">DD/MM/YYYY</div>
+                                    <div
+                                        class="text-[10px] font-normal text-slate-400 normal-case mt-0.5 tracking-normal">
+                                        DD/MM/YYYY</div>
                                 </th>
-                                <th class="px-4 py-3 border-r border-slate-200 dark:border-slate-700">Application ID</th>
+                                <th class="px-4 py-3 border-r border-slate-200 dark:border-slate-700">Application ID
+                                </th>
                                 <th class="px-4 py-3">Student ID</th>
                                 <th class="px-4 py-3">Name</th>
                                 <th class="px-4 py-3">Class</th>
@@ -585,16 +618,26 @@
                                 <th class="px-4 py-3">Roll</th>
                                 <th class="px-4 py-3">
                                     <div>DOB</div>
-                                    <div class="text-[10px] font-normal text-slate-400 normal-case mt-0.5 tracking-normal">DD/MM/YYYY</div>
+                                    <div
+                                        class="text-[10px] font-normal text-slate-400 normal-case mt-0.5 tracking-normal">
+                                        DD/MM/YYYY</div>
                                 </th>
                                 <th class="px-4 py-3">Father's Name</th>
                                 <th class="px-4 py-3">Phone</th>
                                 <th class="px-4 py-3 border-r border-slate-200 dark:border-slate-800">Email ID</th>
-                                <th class="px-4 py-3 border-x border-slate-200 dark:border-slate-800 bg-amber-50/50 dark:bg-amber-900/10 text-amber-700 dark:text-amber-500">Admit Status</th>
-                                <th class="px-4 py-3 bg-blue-50/50 dark:bg-blue-900/10 text-blue-700 dark:text-blue-400">HY Serial No.</th>
-                                <th class="px-4 py-3 bg-blue-50/50 dark:bg-blue-900/10 text-blue-700 dark:text-blue-400">FY Serial No.</th>
-                                
-                                <th class="px-4 py-3 text-center sticky right-0 z-40 bg-slate-50 dark:bg-slate-800/95 shadow-[-4px_0_10px_rgba(0,0,0,0.04)] w-[100px]">Action</th>
+                                <th
+                                    class="px-4 py-3 border-x border-slate-200 dark:border-slate-800 bg-amber-50/50 dark:bg-amber-900/10 text-amber-700 dark:text-amber-500">
+                                    Admit Status</th>
+                                <th
+                                    class="px-4 py-3 bg-blue-50/50 dark:bg-blue-900/10 text-blue-700 dark:text-blue-400">
+                                    HY Serial No.</th>
+                                <th
+                                    class="px-4 py-3 bg-blue-50/50 dark:bg-blue-900/10 text-blue-700 dark:text-blue-400">
+                                    FY Serial No.</th>
+
+                                <th
+                                    class="px-4 py-3 text-center sticky right-0 z-40 bg-slate-50 dark:bg-slate-800/95 shadow-[-4px_0_10px_rgba(0,0,0,0.04)] w-[100px]">
+                                    Action</th>
                             </tr>
                         </thead>
                         <tbody id="studentsTableBody" class="divide-y divide-slate-200 dark:divide-slate-800 text-sm">
@@ -759,29 +802,40 @@
                 </div>
 
                 <!-- 4. SCANNER VERIFIER APP CARD -->
-                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700">
+                <div
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center">
+                        <div
+                            class="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center">
                             <i data-lucide="scan-line" class="w-5 h-5 text-amber-600 dark:text-amber-400"></i>
                         </div>
                         <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">Scanner Verifier App</h3>
                     </div>
 
-                    <div class="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 mb-4">
-                        <span id="verifierStatusBadge" class="px-2.5 py-1 text-xs font-bold rounded-md bg-red-100 text-red-700 border border-red-200">OFFLINE</span>
+                    <div
+                        class="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 mb-4">
+                        <span id="verifierStatusBadge"
+                            class="px-2.5 py-1 text-xs font-bold rounded-md bg-red-100 text-red-700 border border-red-200">OFFLINE</span>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="verifierToggle" class="sr-only peer" onchange="toggleVerifier()">
-                            <div class="w-14 h-7 bg-red-500 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500 shadow-inner"></div>
+                            <div
+                                class="w-14 h-7 bg-red-500 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500 shadow-inner">
+                            </div>
                         </label>
                     </div>
 
                     <div id="verifierPinContainer" class="hidden">
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Active Access PIN</label>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Active Access
+                            PIN</label>
                         <div class="flex">
-                            <input type="text" id="sysVerifierPin" readonly class="w-full p-2.5 text-center text-lg tracking-[0.5em] font-mono font-bold border border-r-0 border-slate-200 rounded-l-lg bg-white dark:bg-slate-950 dark:border-slate-700 dark:text-slate-300 focus:outline-none">
-                            <button onclick="copyLink('sysVerifierPin')" class="px-4 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-r-lg font-bold transition-colors" title="Copy PIN"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                            <input type="text" id="sysVerifierPin" readonly
+                                class="w-full p-2.5 text-center text-lg tracking-[0.5em] font-mono font-bold border border-r-0 border-slate-200 rounded-l-lg bg-white dark:bg-slate-950 dark:border-slate-700 dark:text-slate-300 focus:outline-none">
+                            <button onclick="copyLink('sysVerifierPin')"
+                                class="px-4 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-r-lg font-bold transition-colors"
+                                title="Copy PIN"><i data-lucide="copy" class="w-4 h-4"></i></button>
                         </div>
-                        <p class="text-[10px] text-slate-400 mt-2 text-center">Give this 6-digit PIN to teachers to unlock the scanner.</p>
+                        <p class="text-[10px] text-slate-400 mt-2 text-center">Give this 6-digit PIN to teachers to
+                            unlock the scanner.</p>
                     </div>
                 </div>
 
@@ -1130,10 +1184,10 @@
         let routineHTML = '';
         for (let i = 1; i <= 10; i++) {
             routineHTML += `
-            <div class="grid grid-cols-[1fr_2fr] gap-4 items-center">
-                <input type="date" id="rDate${i}" onclick="try{this.showPicker();}catch(e){}" class="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white cursor-pointer" placeholder="Select Date">
-                <input type="text" id="rPaper${i}" class="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white uppercase" placeholder="Subject / Paper Name (e.g. MATHEMATICS)">
-            </div>`;
+                    <div class="grid grid-cols-[1fr_2fr] gap-4 items-center">
+                        <input type="date" id="rDate${i}" onclick="try{this.showPicker();}catch(e){}" class="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white cursor-pointer" placeholder="Select Date">
+                        <input type="text" id="rPaper${i}" class="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 dark:text-white uppercase" placeholder="Subject / Paper Name (e.g. MATHEMATICS)">
+                    </div>`;
         }
         document.getElementById('routineRowsContainer').innerHTML = routineHTML;
 
@@ -1331,21 +1385,21 @@
         function editableCell(value, fieldKey, rowId, dbType = 'pending', studentClass = '') {
             const safeValue = escapeHtml(value);
             return `
-        <td data-field="${fieldKey}" class="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300 relative group cursor-pointer hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors border-r border-transparent hover:border-blue-200 dark:hover:border-slate-700"
-            onclick="enableEdit(this, '${rowId}', '${fieldKey}', '${dbType}', '${studentClass}')" data-value="${safeValue}">
-            <div class="flex items-center gap-3 justify-between">
-                <div class="flex items-center flex-1 cell-text-wrapper">
-                    <span class="cell-text">${safeValue}</span>
-                </div>
-                <i data-lucide="pencil" class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-blue-500"></i>
-            </div>
-        </td>`;
+                <td data-field="${fieldKey}" class="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-300 relative group cursor-pointer hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors border-r border-transparent hover:border-blue-200 dark:hover:border-slate-700"
+                    onclick="enableEdit(this, '${rowId}', '${fieldKey}', '${dbType}', '${studentClass}')" data-value="${safeValue}">
+                    <div class="flex items-center gap-3 justify-between">
+                        <div class="flex items-center flex-1 cell-text-wrapper">
+                            <span class="cell-text">${safeValue}</span>
+                        </div>
+                        <i data-lucide="pencil" class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-blue-500"></i>
+                    </div>
+                </td>`;
         }
 
         window.enableEdit = function (tdElement, rowId, fieldKey, dbType, studentClass) {
             if (tdElement.classList.contains('is-editing')) return;
             tdElement.classList.add('is-editing'); tdElement.classList.remove('cursor-pointer');
-            
+
             const currentVal = tdElement.getAttribute('data-value');
             let inputHTML = '';
             const isUpper = ['studentId', 'studentName', 'section', 'fatherName'].includes(fieldKey) ? 'uppercase' : '';
@@ -1359,7 +1413,7 @@
                 }
                 inputHTML = `<input type="date" value="${inputValue}" class="edit-input w-full px-2 py-1 text-sm border border-blue-400 dark:border-blue-500 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-inner">`;
             } else if (fieldKey === 'studentClass') {
-                const classes = ['1','2','3','4','5','6','7','8','9','10','11','12'];
+                const classes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
                 let opts = classes.map(c => `<option value="${c}" ${String(currentVal) === c ? 'selected' : ''}>${c}</option>`).join('');
                 inputHTML = `<select class="edit-input w-full px-2 py-1 text-sm border border-blue-400 dark:border-blue-500 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-inner cursor-pointer">${opts}</select>`;
             } else if (fieldKey === 'section') {
@@ -1371,27 +1425,27 @@
             }
 
             tdElement.innerHTML = `
-        <div class="flex items-center gap-1 min-w-[140px]" onclick="event.stopPropagation()">
-            ${inputHTML}
-            <button onclick="saveEdit(this, '${rowId}', '${fieldKey}', '${dbType}', '${studentClass}')" class="save-btn p-1.5 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 rounded transition-colors"><i data-lucide="check" class="w-4 h-4 stroke-[3]"></i></button>
-            <button onclick="cancelEdit(this, '${escapeHtml(currentVal)}', '${rowId}', '${fieldKey}', '${dbType}', '${studentClass}')" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"><i data-lucide="x" class="w-4 h-4 stroke-[3]"></i></button>
-        </div>`;
-            
+                <div class="flex items-center gap-1 min-w-[140px]" onclick="event.stopPropagation()">
+                    ${inputHTML}
+                    <button onclick="saveEdit(this, '${rowId}', '${fieldKey}', '${dbType}', '${studentClass}')" class="save-btn p-1.5 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 rounded transition-colors"><i data-lucide="check" class="w-4 h-4 stroke-[3]"></i></button>
+                    <button onclick="cancelEdit(this, '${escapeHtml(currentVal)}', '${rowId}', '${fieldKey}', '${dbType}', '${studentClass}')" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"><i data-lucide="x" class="w-4 h-4 stroke-[3]"></i></button>
+                </div>`;
+
             lucide.createIcons({ root: tdElement });
-            const input = tdElement.querySelector('.edit-input'); 
-            input.focus(); 
-            
+            const input = tdElement.querySelector('.edit-input');
+            input.focus();
+
             // 2. AUTO-OPEN CALENDAR OR AUTO-SELECT TEXT
             if (input.tagName === 'INPUT') {
                 if (input.type === 'text') {
                     input.setSelectionRange(input.value.length, input.value.length);
                 } else if (input.type === 'date') {
-                    try { input.showPicker(); } catch(e) {} 
+                    try { input.showPicker(); } catch (e) { }
                 }
             }
 
             // 3. ENTER KEY TO SAVE FUNCTIONALITY
-            input.addEventListener('keydown', function(e) {
+            input.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     tdElement.querySelector('.save-btn').click();
@@ -1422,10 +1476,10 @@
             try {
                 const response = await fetch(targetUrl, { method: 'POST', body: JSON.stringify(payload) });
                 const result = await response.json();
-                
+
                 if (result.status === 'success') {
                     showToast(`Updated successfully`, 'success');
-                    
+
                     let displayValue = newValue;
                     if (fieldKey === 'dob' && newValue.includes('-')) {
                         const p = newValue.split('-');
@@ -1461,10 +1515,10 @@
                     // 5. INSTANT RE-RENDER
                     // This forces the table to redraw using the new Local Memory (which now includes the new Student ID)
                     if (['studentClass', 'section', 'rollNo', 'studentId', 'dob'].includes(fieldKey)) {
-                        if (dbType === 'pending') { filterPendingTable(); } 
+                        if (dbType === 'pending') { filterPendingTable(); }
                         else { filterStudentsTable(); }
                     }
-                    
+
                 } else throw new Error(result.message || "Unknown server error");
             } catch (err) {
                 showToast(`Error: ${err.message}`, 'error');
@@ -1485,12 +1539,12 @@
             }
 
             tdElement.innerHTML = `
-        <div class="flex items-center gap-3 justify-between">
-            <div class="flex items-center flex-1 cell-text-wrapper">
-                <span class="cell-text">${escapeHtml(value)}</span>${badgeHtml}
-            </div>
-            <i data-lucide="pencil" class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-blue-500"></i>
-        </div>`;
+                <div class="flex items-center gap-3 justify-between">
+                    <div class="flex items-center flex-1 cell-text-wrapper">
+                        <span class="cell-text">${escapeHtml(value)}</span>${badgeHtml}
+                    </div>
+                    <i data-lucide="pencil" class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-blue-500"></i>
+                </div>`;
             lucide.createIcons({ root: tdElement });
         }
 
@@ -1508,31 +1562,31 @@
 
         function filterPendingTable() {
             const query = document.getElementById('searchPending').value.toLowerCase();
-            
+
             // Get Advanced Filter Values
             const fClass = document.getElementById('filterPendingClass') ? document.getElementById('filterPendingClass').value : 'All';
             const fSec = document.getElementById('filterPendingSection') ? document.getElementById('filterPendingSection').value : 'All';
             const fRoll = document.getElementById('filterPendingRoll') ? document.getElementById('filterPendingRoll').value.trim() : '';
 
             const filteredData = window.currentApplications.filter(app => {
-                const currentStatus = app.status || 'Pending'; 
-                
+                const currentStatus = app.status || 'Pending';
+
                 // 1. Matches the Top Tabs (All, Pending, Approved, Rejected)
                 const matchesStatus = currentAppFilter === 'All' || currentStatus === currentAppFilter;
-                
+
                 // 2. Matches the Search Bar
                 const matchesSearch = String(app.studentName).toLowerCase().includes(query) || String(app.applicationId).toLowerCase().includes(query);
-                
+
                 // 3. Matches the Advanced Filters
                 const matchesClass = fClass === 'All' || String(app.studentClass) === fClass;
                 const matchesSec = fSec === 'All' || String(app.section).toUpperCase() === fSec;
-                
+
                 // Roll number padding ensures "5" matches "05"
                 const matchesRoll = fRoll === '' || String(app.rollNo).padStart(2, '0') === String(fRoll).padStart(2, '0');
 
                 return matchesStatus && matchesSearch && matchesClass && matchesSec && matchesRoll;
             });
-            
+
             renderTable(filteredData);
         }
 
@@ -1550,10 +1604,105 @@
             }
         }
 
+        // ==========================================
+        // NEW: BULK PENDING PROCESSING CONTROLLERS
+        // ==========================================
+        function toggleSelectAllPending(source) {
+            document.querySelectorAll('.pending-checkbox').forEach(cb => cb.checked = source.checked);
+            toggleBulkPendingButtons();
+        }
+
+        function toggleBulkPendingButtons() {
+            const anyChecked = document.querySelectorAll('.pending-checkbox:checked').length > 0;
+            document.querySelectorAll('.bulk-pending-btn').forEach(btn => anyChecked ? btn.classList.remove('hidden') : btn.classList.add('hidden'));
+        }
+
+        function bulkPendingAction(type) {
+            const checkedBoxes = document.querySelectorAll('.pending-checkbox:checked');
+            if (checkedBoxes.length === 0) return;
+
+            const targetLabel = type === 'approve' ? 'Approve Selected' : 'Reject Selected';
+            const targetColor = type === 'approve' ? 'bg-emerald-100 text-emerald-600' : 'bg-orange-100 text-orange-600';
+            const targetBtnColor = type === 'approve' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-orange-600 hover:bg-orange-700';
+
+            // Setup Custom UI Confirm Modal
+            document.getElementById('confirmIconBox').className = `w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${targetColor}`;
+            document.getElementById('confirmIcon').setAttribute('data-lucide', type === 'approve' ? 'check-circle' : 'alert-octagon');
+            document.getElementById('confirmTitle').innerText = `${type === 'approve' ? 'Bulk Approve' : 'Bulk Reject'} Applications`;
+            document.getElementById('confirmAppId').innerText = `${checkedBoxes.length} Applications Selected`;
+            document.getElementById('confirmMessage').innerText = `Are you sure you want to process all ${checkedBoxes.length} selected applications? System will sequentially fire automated verification emails to all parents/students.`;
+
+            const btn = document.getElementById('confirmExecuteBtn');
+            btn.className = `px-5 py-2.5 rounded-xl font-medium text-white shadow-sm flex items-center gap-2 ${targetBtnColor} transition-colors`;
+            btn.innerHTML = `${targetLabel}`;
+
+            btn.onclick = async function () {
+                btn.disabled = true;
+                let processedCounter = 0;
+                const totalCount = checkedBoxes.length;
+
+                for (const cb of checkedBoxes) {
+                    processedCounter++;
+                    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 spin"></i> [${processedCounter}/${totalCount}] Processing...`;
+                    lucide.createIcons({ root: btn });
+
+                    const tr = cb.closest('tr');
+                    const appId = tr.getAttribute('data-appid');
+                    const data = window.currentApplications.find(r => r.applicationId === appId);
+
+                    if (!data) continue;
+
+                    try {
+                        if (type === 'approve') {
+                            // 1. Write student securely into Final DB Class sheet
+                            const payload = {
+                                action: 'approve_student',
+                                token: ADMIN_SECRET,
+                                applicationId: data.applicationId,
+                                studentId: data.studentId,
+                                studentName: data.studentName,
+                                studentClass: data.studentClass,
+                                section: data.section,
+                                rollNo: data.rollNo,
+                                dob: data.dob,
+                                fatherName: data.fatherName,
+                                phone: data.phone,
+                                email: data.email
+                            };
+                            const fRes = await fetch(FINAL_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+                            const fResult = await fRes.json();
+                            if (fResult.status !== 'success') throw new Error(fResult.message);
+
+                            // 2. Clear out from Pending DB sheet
+                            await fetch(PENDING_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'delete_pending', token: ADMIN_SECRET, appId: appId }) });
+                        } else {
+                            // Rejections process directly through script 1 endpoint
+                            const rRes = await fetch(PENDING_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'reject_application', token: ADMIN_SECRET, appId: appId }) });
+                            const rResult = await rRes.json();
+                            if (rResult.status !== 'success') throw new Error(rResult.message);
+                        }
+                    } catch (err) {
+                        console.error(`Error with ${appId}:`, err);
+                        showToast(`Failed to process: ${appId}`, 'error');
+                    }
+                }
+
+                showToast(`Successfully processed batch operations!`, 'success');
+                btn.disabled = false;
+                closeModal('confirmModal');
+                document.getElementById('selectAllPending').checked = false;
+                toggleBulkPendingButtons();
+                fetchData();
+                fetchFinalStudents();
+            };
+
+            openModal('confirmModal');
+        }
+
         function renderTable(dataArray) {
             const tbody = document.getElementById('tableBody'); tbody.innerHTML = '';
             if (!dataArray || dataArray.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" class="px-4 py-12 text-center text-slate-500 dark:text-slate-400"><i data-lucide="inbox" class="w-8 h-8 mb-2 opacity-50 mx-auto"></i>No records found for this filter.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="13" class="px-4 py-12 text-center text-slate-500 dark:text-slate-400"><i data-lucide="inbox" class="w-8 h-8 mb-2 opacity-50 mx-auto"></i>No records found for this filter.</td></tr>`;
                 lucide.createIcons(); return;
             }
 
@@ -1590,193 +1739,32 @@
                 } else if (row.status === 'Approved') { actionHtml = `<div class="flex items-center justify-center gap-2"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200">Approved</span><button onclick="openDeletePendingModal('${row.applicationId}')" class="p-1 text-slate-400 hover:text-red-600 transition-colors" title="Delete Record"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`; }
                 else { actionHtml = `<div class="flex items-center justify-center gap-2"><span class="px-2.5 py-1 text-xs font-bold rounded-md bg-red-100 text-red-700 border border-red-200">Rejected</span><button onclick="openDeletePendingModal('${row.applicationId}')" class="p-1 text-slate-400 hover:text-red-600 transition-colors" title="Delete Record"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`; }
 
-                const tr = document.createElement('tr'); 
-                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors";
-                
-                // NEW: Inject the applicationId into the row so the bulk script can find it
+                const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors";
                 tr.setAttribute('data-appid', row.applicationId);
+                // Check if row is currently in a state that permits bulk checking
+                const isPending = (row.status === 'Pending' || !row.status);
+                const checkboxCell = isPending
+                    ? `<td class="px-4 py-3 text-center sticky left-0 z-10 bg-white dark:bg-slate-900 shadow-[4px_0_10px_rgba(0,0,0,0.04)] border-r border-slate-100 dark:border-slate-800"><input type="checkbox" onchange="toggleBulkPendingButtons()" class="pending-checkbox rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"></td>`
+                    : `<td class="px-4 py-3 text-center sticky left-0 z-10 bg-white dark:bg-slate-900 shadow-[4px_0_10px_rgba(0,0,0,0.04)] border-r border-slate-100 dark:border-slate-800 text-slate-300 dark:text-slate-700">—</td>`;
 
                 tr.innerHTML = `
-                    <td class="px-4 py-3 text-center sticky left-0 z-10 bg-white dark:bg-slate-900 shadow-[4px_0_10px_rgba(0,0,0,0.04)] border-r border-slate-100 dark:border-slate-800">
-                        <input type="checkbox" onchange="togglePendingBulkButtons()" class="pending-checkbox rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500">
-                    </td>
+                    ${checkboxCell}
                     <td class="px-4 py-3 whitespace-nowrap text-slate-500 dark:text-slate-400">${cleanTs}</td>
                     <td class="px-4 py-3 whitespace-nowrap font-medium text-slate-600 dark:text-slate-300 border-r border-slate-200 dark:border-slate-700">${row.applicationId}</td>
-                    ${editableCell(row.studentId, 'studentId', row.applicationId)}
-                    ${editableCell(row.studentName, 'studentName', row.applicationId)}
-                    ${editableCell(row.studentClass, 'studentClass', row.applicationId)}
-                    ${editableCell(row.section, 'section', row.applicationId)}
-                    ${editableCell(row.rollNo, 'rollNo', row.applicationId)}
-                    ${editableCell(cleanDob, 'dob', row.applicationId)}
-                    ${editableCell(row.fatherName, 'fatherName', row.applicationId)}
-                    ${editableCell(row.phone, 'phone', row.applicationId)}
-                    ${editableCell(row.email, 'email', row.applicationId)}
-                    <td class="px-4 py-3 whitespace-nowrap text-center sticky right-0 z-40 bg-white dark:bg-slate-900 shadow-[-4px_0_10px_rgba(0,0,0,0.04)] border-l border-slate-200 dark:border-slate-800">${actionHtml}</td>
-                `;
+                            ${editableCell(row.studentId, 'studentId', row.applicationId)}
+                            ${editableCell(row.studentName, 'studentName', row.applicationId)}
+                            ${editableCell(row.studentClass, 'studentClass', row.applicationId)}
+                            ${editableCell(row.section, 'section', row.applicationId)}
+                            ${editableCell(row.rollNo, 'rollNo', row.applicationId)}
+                            ${editableCell(cleanDob, 'dob', row.applicationId)}
+                            ${editableCell(row.fatherName, 'fatherName', row.applicationId)}
+                            ${editableCell(row.phone, 'phone', row.applicationId)}
+                            ${editableCell(row.email, 'email', row.applicationId)}
+                            <td class="px-4 py-3 whitespace-nowrap text-center sticky right-0 z-10 bg-white dark:bg-slate-900 shadow-[-4px_0_10px_rgba(0,0,0,0.04)] border-l border-slate-200 dark:border-slate-800">${actionHtml}</td>
+                        `;
                 tbody.appendChild(tr);
             });
             lucide.createIcons();
-        }
-
-        // ==========================================
-        // BULLETPROOF GOOGLE SCRIPT FETCH HELPER
-        // ==========================================
-        async function safeGasFetch(url, payloadObj) {
-            // 1. Inject a unique ID to guarantee the JSON string is mathematically distinct
-            payloadObj._request_id = Math.random().toString(36).substring(2) + Date.now().toString(36);
-            
-            // 2. Add random spaces to completely alter the byte length of the POST body
-            let bodyStr = JSON.stringify(payloadObj);
-            bodyStr += " ".repeat(Math.floor(Math.random() * 50) + 10);
-
-            // 3. Make the URL unique to bypass any proxy caching
-            const bypassUrl = `${url}?cb=${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-
-            // 4. Fire simple POST (Omitting custom headers totally prevents the CORS block)
-            const res = await fetch(bypassUrl, {
-                method: 'POST',
-                cache: 'no-store',
-                body: bodyStr
-            });
-
-            if (!res.ok) throw new Error("Network request failed");
-            return await res.json();
-        }
-
-        // ==========================================
-        // APPLICATIONS BULK ACTIONS (Sequential Processing)
-        // ==========================================
-        function toggleSelectAllPending(source) {
-            document.querySelectorAll('.pending-checkbox').forEach(cb => cb.checked = source.checked);
-            togglePendingBulkButtons();
-        }
-
-        function togglePendingBulkButtons() {
-            const anyChecked = document.querySelectorAll('.pending-checkbox:checked').length > 0;
-            document.querySelectorAll('.pending-bulk-btn').forEach(btn => anyChecked ? btn.classList.remove('hidden') : btn.classList.add('hidden'));
-        }
-
-        function bulkPendingAction(actionType) {
-            const checkedBoxes = document.querySelectorAll('.pending-checkbox:checked');
-            if (checkedBoxes.length === 0) return;
-
-            const actionText = actionType === 'approve' ? 'Approve' : 'Reject';
-            
-            // Setup Modal UI
-            document.getElementById('confirmIconBox').className = actionType === 'approve' 
-                ? "w-12 h-12 rounded-full flex items-center justify-center bg-emerald-100 text-emerald-600"
-                : "w-12 h-12 rounded-full flex items-center justify-center bg-orange-100 text-orange-600";
-            document.getElementById('confirmIcon').setAttribute('data-lucide', actionType === 'approve' ? 'check-circle' : 'alert-octagon');
-            document.getElementById('confirmTitle').innerText = `Bulk ${actionText} Applications`;
-            document.getElementById('confirmAppId').innerText = `${checkedBoxes.length} Applications Selected`;
-            document.getElementById('confirmMessage').innerText = `Are you sure you want to ${actionText.toLowerCase()} these ${checkedBoxes.length} applications? Emails will be sent sequentially to prevent server overload. Please do not close the tab until processing is complete.`;
-
-            const btn = document.getElementById('confirmExecuteBtn');
-            btn.className = actionType === 'approve' 
-                ? "px-5 py-2.5 rounded-xl font-medium text-white shadow-sm flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 transition-colors"
-                : "px-5 py-2.5 rounded-xl font-medium text-white shadow-sm flex items-center gap-2 bg-orange-600 hover:bg-orange-700 transition-colors";
-            btn.innerHTML = `Start Bulk ${actionText}`;
-
-            btn.onclick = async function () {
-                btn.disabled = true;
-                
-                // SEQUENTIAL LOOP to protect Google Mail Quotas and API Rate Limits
-                for (let i = 0; i < checkedBoxes.length; i++) {
-                    const cb = checkedBoxes[i];
-                    const tr = cb.closest('tr');
-                    const currentAppId = tr.getAttribute('data-appid'); 
-                    
-                    const originalData = window.currentApplications.find(r => r.applicationId === currentAppId);
-                    if (!originalData) continue;
-
-                    // Deep clone the data
-                    const payloadData = JSON.parse(JSON.stringify(originalData));
-
-                    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 spin"></i> Processing ${i + 1} of ${checkedBoxes.length}...`;
-                    lucide.createIcons({ root: btn });
-
-                    try {
-                        // THE FIX: "Payload Padding" & Unique IDs
-                        // We generate a totally random string of spaces to drastically change the byte-size of the request.
-                        // This mathematically forces Google's load balancer to realize it's a NEW request and drop the cached body of the previous student!
-                        const uniqueId = Math.random().toString(36).substring(2) + Date.now().toString(36);
-                        const paddingSpaces = " ".repeat(Math.floor(Math.random() * 500) + 100);
-
-                        // Attach unique parameters to the URL to bypass browser cache
-                        const finalFetchUrl = `${FINAL_SCRIPT_URL}?req=${uniqueId}`;
-                        const pendingFetchUrl = `${PENDING_SCRIPT_URL}?req=${uniqueId}`;
-
-                        if (actionType === 'approve') {
-                            payloadData.action = 'approve_student';
-                            payloadData.token = ADMIN_SECRET;
-                            payloadData._req_id = uniqueId; // Ensure JSON object is also uniquely mutated
-                            
-                            // Pad the JSON string with our random spaces
-                            const finalBodyStr = JSON.stringify(payloadData) + paddingSpaces;
-                            
-                            // Send to Final DB (Emails student) using browser-level cache busting (no-store)
-                            const fRes = await fetch(finalFetchUrl, { 
-                                method: 'POST', 
-                                cache: 'no-store', 
-                                body: finalBodyStr 
-                            });
-                            const fResult = await fRes.json();
-                            if (fResult.status !== 'success') throw new Error(fResult.message);
-                            
-                            // Mark as Approved in Pending DB
-                            const pendingBodyStr = JSON.stringify({ action: 'delete_pending', token: ADMIN_SECRET, appId: currentAppId, _req_id: uniqueId }) + paddingSpaces;
-                            await fetch(pendingFetchUrl, { 
-                                method: 'POST', 
-                                cache: 'no-store', 
-                                body: pendingBodyStr 
-                            });
-                            
-                            // Optimistically update local memory
-                            originalData.status = 'Approved';
-                            
-                        } else { 
-                            // Reject logic
-                            const rejectBodyStr = JSON.stringify({ action: 'reject_application', token: ADMIN_SECRET, appId: currentAppId, _req_id: uniqueId }) + paddingSpaces;
-                            const rRes = await fetch(pendingFetchUrl, { 
-                                method: 'POST', 
-                                cache: 'no-store', 
-                                body: rejectBodyStr 
-                            });
-                            const rResult = await rRes.json();
-                            if (rResult.status !== 'success') throw new Error(rResult.message);
-                            
-                            originalData.status = 'Rejected';
-                        }
-
-                        // Cooldown to ensure the network connection severs cleanly before the next loop
-                        await new Promise(resolve => setTimeout(resolve, 1500));
-
-                    } catch (e) {
-                        console.error(`Error processing ${currentAppId}:`, e);
-                        showToast(`Failed on ${currentAppId}. Continuing...`, 'error');
-                    }
-                }
-
-                // Clean up when the entire loop finishes
-                showToast(`Bulk ${actionText} Complete!`, 'success');
-                btn.disabled = false;
-                closeModal('confirmModal');
-                
-                // Uncheck master box
-                const masterCheck = document.getElementById('selectAllPending');
-                if (masterCheck) {
-                    masterCheck.checked = false;
-                    toggleSelectAllPending(masterCheck);
-                }
-                
-                // Instantly re-render table with new statuses
-                filterPendingTable();
-                
-                // Fetch Final Students silently in background so the other tab is up to date!
-                if (actionType === 'approve') fetchFinalStudents(); 
-            };
-
-            openModal('confirmModal');
         }
 
         // ==========================================
@@ -1835,7 +1823,7 @@
                     memAppClasses = conf.App_Classes || '';
                     memAppClose = conf.App_Auto_Close || '';
                     memAdmitClose = conf.Admit_Auto_Close || '';
-                    
+
                     // NEW: Read the Verifier Data from the DB
                     memVerifierStatus = conf.Verifier_Status || 'OFF';
                     memVerifierPin = conf.Verifier_Pin || '';
@@ -2083,7 +2071,7 @@
                     { key: 'Admit_Portal_Token', value: memAdmitToken },
                     { key: 'Admit_Auto_Close', value: memAdmitClose },
                     // NEW: Ensure we save the current verifier state so it isn't erased
-                    { key: 'Verifier_Status', value: memVerifierStatus }, 
+                    { key: 'Verifier_Status', value: memVerifierStatus },
                     { key: 'Verifier_Pin', value: memVerifierPin }
                 ]
             };
@@ -2122,7 +2110,7 @@
                     { key: 'Admit_Portal_Token', value: memAdmitToken },
                     { key: 'Admit_Auto_Close', value: memAdmitClose },
                     // NEW: Ensure we save the current verifier state so it isn't erased
-                    { key: 'Verifier_Status', value: memVerifierStatus }, 
+                    { key: 'Verifier_Status', value: memVerifierStatus },
                     { key: 'Verifier_Pin', value: memVerifierPin }
                 ]
             };
@@ -2186,6 +2174,7 @@
 
             pendingBulkStatus = status;
 
+            // 1. Setup the beautiful Custom Confirm Modal instead of the ugly browser alert
             document.getElementById('confirmIconBox').className = "w-12 h-12 rounded-full flex items-center justify-center bg-amber-100 text-amber-600";
             document.getElementById('confirmIcon').setAttribute('data-lucide', 'alert-circle');
             document.getElementById('confirmTitle').innerText = "Confirm Status Update";
@@ -2196,49 +2185,61 @@
             btn.className = "px-5 py-2.5 rounded-xl font-medium text-white shadow-sm flex items-center gap-2 bg-amber-600 hover:bg-amber-700 transition-colors";
             btn.innerHTML = `Update Status`;
 
+            // 2. Define what happens when they click "Update Status"
             btn.onclick = async function () {
                 btn.disabled = true;
-                
-                // Use sequential processing here too to prevent connection pooling
-                for (let i = 0; i < checkedBoxes.length; i++) {
-                    const cb = checkedBoxes[i];
+                btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 spin"></i> Updating...`;
+                lucide.createIcons({ root: btn });
+
+                const fetchPromises = [];
+
+                checkedBoxes.forEach(cb => {
                     const tr = cb.closest('tr');
                     const sId = tr.getAttribute('data-sid');
                     const sClass = tr.getAttribute('data-sclass');
 
-                    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 spin"></i> Updating ${i + 1} of ${checkedBoxes.length}...`;
-                    lucide.createIcons({ root: btn });
-
+                    // A. Update Local Memory Instantly (This FIXES the crash!)
                     const memRow = window.finalStudentsData.find(r => r.studentId === sId);
                     if (memRow) memRow.admitStatus = status;
 
-                    const payload = { 
-                        action: 'update_cell', 
-                        token: ADMIN_SECRET, 
-                        studentId: sId, 
-                        studentClass: sClass, 
-                        field: 'admitStatus', 
-                        value: status 
+                    // B. Queue up the background fetch to Google Sheets
+                    const payload = {
+                        action: 'update_cell',
+                        token: ADMIN_SECRET,
+                        studentId: sId,
+                        studentClass: sClass,
+                        field: 'admitStatus',
+                        value: status
                     };
-                    
-                    try {
-                        await safeGasFetch(FINAL_SCRIPT_URL, payload);
-                        
-                        // Very fast delay for simple cell updates
-                        await new Promise(resolve => setTimeout(resolve, 600));
-                    } catch (e) {
-                        console.error(`Failed to update ${sId}`, e);
-                    }
-                }
 
-                showToast(`Status updated to ${status} successfully!`, 'success');
-                btn.disabled = false;
-                closeModal('confirmModal');
-                
-                document.getElementById('selectAll').checked = false; 
-                filterStudentsTable();
+                    fetchPromises.push(
+                        fetch(FINAL_SCRIPT_URL, {
+                            method: 'POST',
+                            body: JSON.stringify(payload)
+                        })
+                    );
+                });
+
+                try {
+                    // Wait for all background saves to finish
+                    await Promise.all(fetchPromises);
+                    showToast(`Status updated to ${status} successfully!`, 'success');
+                } catch (e) {
+                    showToast(`Warning: Some updates may have failed on the server.`, 'error');
+                } finally {
+                    // Reset Modal and UI
+                    btn.disabled = false;
+                    closeModal('confirmModal');
+
+                    // Uncheck the "Select All" box
+                    document.getElementById('selectAll').checked = false;
+
+                    // Re-render the table safely to show the new colored badges
+                    filterStudentsTable();
+                }
             };
 
+            // Trigger the modal to open
             openModal('confirmModal');
         }
 
@@ -2307,29 +2308,29 @@
                 tr.setAttribute('data-sid', row.studentId); tr.setAttribute('data-sclass', row.studentClass);
 
                 tr.innerHTML = `
-                    <td class="px-4 py-3 text-center sticky left-0 z-10 bg-white dark:bg-slate-900 shadow-[4px_0_10px_rgba(0,0,0,0.04)] border-r border-slate-100 dark:border-slate-800"><input type="checkbox" onchange="toggleBulkButtons()" class="student-checkbox rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"></td>
-                    <td class="px-4 py-3 whitespace-nowrap text-slate-500 dark:text-slate-400">${cleanTs}</td>
-                    <td class="px-4 py-3 whitespace-nowrap font-medium text-slate-600 dark:text-slate-300 border-r border-slate-200 dark:border-slate-700">${row.applicationId}</td>
-                    ${editableCell(row.studentId, 'studentId', uniqueKey, dbType, row.studentClass)}
-                    ${editableCell(row.studentName, 'studentName', uniqueKey, dbType, row.studentClass)}
-                    ${editableCell(row.studentClass, 'studentClass', uniqueKey, dbType, row.studentClass)}
-                    ${editableCell(row.section, 'section', uniqueKey, dbType, row.studentClass)}
-                    ${editableCell(row.rollNo, 'rollNo', uniqueKey, dbType, row.studentClass)}
-                    ${editableCell(cleanDob, 'dob', uniqueKey, dbType, row.studentClass)}
-                    ${editableCell(row.fatherName, 'fatherName', uniqueKey, dbType, row.studentClass)}
-                    ${editableCell(row.phone, 'phone', uniqueKey, dbType, row.studentClass)}
-                    ${editableCell(row.email, 'email', uniqueKey, dbType, row.studentClass)}
-                    <td class="px-4 py-3 text-center border-x border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"><span class="px-2 py-1 text-xs font-bold rounded-md border ${stCol}">${st}</span></td>
-                    <td class="px-4 py-3 text-blue-700 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10 font-medium">${row.hySerial || '-'}</td>
-                    <td class="px-4 py-3 text-blue-700 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10 border-r border-slate-200 dark:border-slate-800 font-medium">${row.fySerial || '-'}</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center sticky right-0 z-10 bg-white dark:bg-slate-900 shadow-[-4px_0_10px_rgba(0,0,0,0.04)]">
-                        <div class="flex justify-center gap-2">
-                            <button onclick="prepareDirectPrint('${row.studentId}')" class="p-1.5 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white border border-purple-200 transition-colors" title="Download Admit Card"><i data-lucide="printer" class="w-4 h-4"></i></button>
-                            <button onclick="openAdmitModal('${row.studentId}', '${row.studentClass}', '${st}')" class="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 transition-colors" title="Manage Admit Status"><i data-lucide="shield" class="w-4 h-4"></i></button>
-                            <button onclick="openDeleteStudentModal('${row.studentId}', '${row.studentClass}')" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border border-red-200 transition-colors" title="Delete Student"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </div>
-                    </td>
-                `;
+                            <td class="px-4 py-3 text-center sticky left-0 z-10 bg-white dark:bg-slate-900 shadow-[4px_0_10px_rgba(0,0,0,0.04)] border-r border-slate-100 dark:border-slate-800"><input type="checkbox" onchange="toggleBulkButtons()" class="student-checkbox rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"></td>
+                            <td class="px-4 py-3 whitespace-nowrap text-slate-500 dark:text-slate-400">${cleanTs}</td>
+                            <td class="px-4 py-3 whitespace-nowrap font-medium text-slate-600 dark:text-slate-300 border-r border-slate-200 dark:border-slate-700">${row.applicationId}</td>
+                            ${editableCell(row.studentId, 'studentId', uniqueKey, dbType, row.studentClass)}
+                            ${editableCell(row.studentName, 'studentName', uniqueKey, dbType, row.studentClass)}
+                            ${editableCell(row.studentClass, 'studentClass', uniqueKey, dbType, row.studentClass)}
+                            ${editableCell(row.section, 'section', uniqueKey, dbType, row.studentClass)}
+                            ${editableCell(row.rollNo, 'rollNo', uniqueKey, dbType, row.studentClass)}
+                            ${editableCell(cleanDob, 'dob', uniqueKey, dbType, row.studentClass)}
+                            ${editableCell(row.fatherName, 'fatherName', uniqueKey, dbType, row.studentClass)}
+                            ${editableCell(row.phone, 'phone', uniqueKey, dbType, row.studentClass)}
+                            ${editableCell(row.email, 'email', uniqueKey, dbType, row.studentClass)}
+                            <td class="px-4 py-3 text-center border-x border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"><span class="px-2 py-1 text-xs font-bold rounded-md border ${stCol}">${st}</span></td>
+                            <td class="px-4 py-3 text-blue-700 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10 font-medium">${row.hySerial || '-'}</td>
+                            <td class="px-4 py-3 text-blue-700 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10 border-r border-slate-200 dark:border-slate-800 font-medium">${row.fySerial || '-'}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-center sticky right-0 z-10 bg-white dark:bg-slate-900 shadow-[-4px_0_10px_rgba(0,0,0,0.04)]">
+                                <div class="flex justify-center gap-2">
+                                    <button onclick="prepareDirectPrint('${row.studentId}')" class="p-1.5 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white border border-purple-200 transition-colors" title="Download Admit Card"><i data-lucide="printer" class="w-4 h-4"></i></button>
+                                    <button onclick="openAdmitModal('${row.studentId}', '${row.studentClass}', '${st}')" class="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 transition-colors" title="Manage Admit Status"><i data-lucide="shield" class="w-4 h-4"></i></button>
+                                    <button onclick="openDeleteStudentModal('${row.studentId}', '${row.studentClass}')" class="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border border-red-200 transition-colors" title="Delete Student"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                </div>
+                            </td>
+                        `;
                 tr.querySelector('[data-field="studentName"] .cell-text').innerHTML += badge;
                 tbody.appendChild(tr);
             });
@@ -2395,7 +2396,7 @@
         }
         async function submitAdmitStatus(status) {
             closeModal('admitModal');
-            
+
             // 1. Optimistic UI: Update local memory instantly
             const memRow = window.finalStudentsData.find(r => r.studentId === activeStudentId);
             if (memRow) {
@@ -2404,26 +2405,26 @@
 
             // 2. Instantly re-render the table to show the new colored badge (NO server reload!)
             filterStudentsTable();
-            
+
             showToast(`Status changed to ${status}. Saving to sheet...`, 'info');
 
             // 3. Send the actual update to Google Sheets in the background
-            const payload = { 
-                action: 'update_cell', 
-                token: ADMIN_SECRET, 
-                studentId: activeStudentId, 
-                studentClass: activeStudentClass, 
-                field: 'admitStatus', 
-                value: status 
+            const payload = {
+                action: 'update_cell',
+                token: ADMIN_SECRET,
+                studentId: activeStudentId,
+                studentClass: activeStudentClass,
+                field: 'admitStatus',
+                value: status
             };
 
             try {
-                const res = await fetch(FINAL_SCRIPT_URL, { 
-                    method: 'POST', 
-                    body: JSON.stringify(payload) 
+                const res = await fetch(FINAL_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
                 });
                 const result = await res.json();
-                
+
                 if (result.status === 'success') {
                     showToast('Successfully saved to database!', 'success');
                 } else {
@@ -2614,81 +2615,81 @@
 
             // Using the EXACT HTML Template provided in your code
             const html = `
-                <div class="admit-card-page">
-                    <div class="page-background-overlay"></div>
-                    
-                    <header class="header">
-                        <img src="logo.png" class="logo-h" onerror="this.style.display='none'">
-                        <div class="header-text">
-                            <h1>MAHARISHI VIDYA MANDIR,<br>NALBARI</h1>
-                            <p class="sub-1">CBSE CURRICULUM • BATIRAM ROAD, NALBARI, PIN-781335</p>
-                            <p class="admit-title">ADMIT CARD</p>
-                            <p class="exam-title">${examNameStr}</p>
-                        </div>
-                        <img src="logo.png" class="logo-h" onerror="this.style.display='none'">
-                    </header>
-
-                    <div class="content-flex">
-                        <div class="details-area">
-                            <table class="details-table">
-                                <tr><td class="lbl">Student Name</td><td class="val">${data.studentName}</td></tr>
-                                <tr><td class="lbl">Father's Name</td><td class="val">${data.fatherName}</td></tr>
-                                <tr><td class="lbl">Student ID</td><td class="val">${data.studentId}</td></tr>
-                                <tr><td class="lbl">Class & Section</td><td class="val">${data.studentClass} - ${data.section}</td></tr>
-                                <tr><td class="lbl">Roll Number</td><td class="val">${data.rollNo}</td></tr>
-                            </table>
-                        </div>
-                        <div class="photo-area">
-                            <div class="photo-box">
-                                ${data.photoUrl ? `<img src="${data.photoUrl}">` : 'Affix recent passport size photograph in school uniform'}
+                        <div class="admit-card-page">
+                            <div class="page-background-overlay"></div>
+                            
+                            <header class="header">
+                                <img src="logo.png" class="logo-h" onerror="this.style.display='none'">
+                                <div class="header-text">
+                                    <h1>MAHARISHI VIDYA MANDIR,<br>NALBARI</h1>
+                                    <p class="sub-1">CBSE CURRICULUM • BATIRAM ROAD, NALBARI, PIN-781335</p>
+                                    <p class="admit-title">ADMIT CARD</p>
+                                    <p class="exam-title">${examNameStr}</p>
+                                </div>
+                                <img src="logo.png" class="logo-h" onerror="this.style.display='none'">
+                            </header>
+        
+                            <div class="content-flex">
+                                <div class="details-area">
+                                    <table class="details-table">
+                                        <tr><td class="lbl">Student Name</td><td class="val">${data.studentName}</td></tr>
+                                        <tr><td class="lbl">Father's Name</td><td class="val">${data.fatherName}</td></tr>
+                                        <tr><td class="lbl">Student ID</td><td class="val">${data.studentId}</td></tr>
+                                        <tr><td class="lbl">Class & Section</td><td class="val">${data.studentClass} - ${data.section}</td></tr>
+                                        <tr><td class="lbl">Roll Number</td><td class="val">${data.rollNo}</td></tr>
+                                    </table>
+                                </div>
+                                <div class="photo-area">
+                                    <div class="photo-box">
+                                        ${data.photoUrl ? `<img src="${data.photoUrl}">` : 'Affix recent passport size photograph in school uniform'}
+                                    </div>
+                                    <div class="issued-under-photo">Issued: ${issuedTime}</div>
+                                </div>
                             </div>
-                            <div class="issued-under-photo">Issued: ${issuedTime}</div>
+        
+                            <div class="barcode-section">
+                                <div class="barcode-disp" style="font-family: 'Libre Barcode 39', cursive !important; color: #000 !important;">${barcodeID}</div>
+                            </div>
+        
+                            <table class="exam-table">
+                                <thead><tr><th>Date</th><th>Subject / Paper</th><th>Student Sig.</th><th>Invigilator Sig.</th></tr></thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+        
+                            <footer class="footer-sigs">
+                                <div class="sig-item">
+                                    ${data.signatureUrl ? `<img src="${data.signatureUrl}" class="sig-img">` : '<div style="height:60px"></div>'}
+                                    <div class="sig-line">Student's Signature</div>
+                                </div>
+                                <div class="sig-item" style="text-align: left; font-size: 11px; font-weight: 800; line-height: 1.4;">
+                                    <img src="sign.png" class="sig-img" style="display: block; margin-left: 0;" onerror="this.style.display='none'">
+                                    PRINCIPAL<br>
+                                    MVM NALBARI<br>
+                                    Date: ${issuedTime}<br>
+                                    Location: Nalbari, Assam
+                                </div>
+                            </footer>
                         </div>
-                    </div>
-
-                    <div class="barcode-section">
-                        <div class="barcode-disp" style="font-family: 'Libre Barcode 39', cursive !important; color: #000 !important;">${barcodeID}</div>
-                    </div>
-
-                    <table class="exam-table">
-                        <thead><tr><th>Date</th><th>Subject / Paper</th><th>Student Sig.</th><th>Invigilator Sig.</th></tr></thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-
-                    <footer class="footer-sigs">
-                        <div class="sig-item">
-                            ${data.signatureUrl ? `<img src="${data.signatureUrl}" class="sig-img">` : '<div style="height:60px"></div>'}
-                            <div class="sig-line">Student's Signature</div>
+        
+                        <div class="instructions-page">
+                            <div class="page-background-overlay"></div>
+                            <h2 style="color: var(--school-blue); text-align: center; text-decoration: underline; font-family: 'Montserrat', sans-serif;">EXAMINATION INSTRUCTIONS</h2>
+                            <ol style="line-height: 2.2; font-size: 15px; margin-top: 15px; color: #000; font-weight: 700; padding-left: 25px; position: relative; z-index: 1;">
+                                <li>On all examination days, students must carry their Admit Card. Without the admit card, entry into the examination hall will not be permitted.</li>
+                                <li>Students must reach the school at least 15 minutes before the reporting time. Late entry after the seating time will not be allowed.</li>
+                                <li>Carrying electronic devices such as mobile phones, smartwatches, calculators, or any other gadgets inside the examination hall is strictly prohibited.</li>
+                                <li>No candidate shall adopt or indulge in unfair means or malpractices during the examination. If found guilty, the candidature will be cancelled and legal action will be taken.</li>
+                                <li>Students must maintain silence and discipline inside the examination hall. Any misconduct will lead to immediate disqualification.</li>
+                                <li>Do not write anything on the question paper or admit card, except where signatures are required.</li>
+                                <li>The admit card must clearly display all student details, the barcode, and the principal's signature. Admit cards without these will not be accepted.</li>
+                                <li>Students must verify all details carefully before printing the admit card. In case of any errors, immediately inform the school administration.</li>
+                            </ol>
+                            <div style="margin-top: auto; position: relative; z-index: 1;">
+                                <div style="text-align: center;"><div class="hash-disp" style="font-family: 'Libre Barcode 39', cursive !important; font-size: 40px; color:#000 !important;">${barcodeID}</div></div>
+                                <div class="page-timestamp-footer">Issued via Admin Portal: ${issuedTime}</div>
+                            </div>
                         </div>
-                        <div class="sig-item" style="text-align: left; font-size: 11px; font-weight: 800; line-height: 1.4;">
-                            <img src="sign.png" class="sig-img" style="display: block; margin-left: 0;" onerror="this.style.display='none'">
-                            PRINCIPAL<br>
-                            MVM NALBARI<br>
-                            Date: ${issuedTime}<br>
-                            Location: Nalbari, Assam
-                        </div>
-                    </footer>
-                </div>
-
-                <div class="instructions-page">
-                    <div class="page-background-overlay"></div>
-                    <h2 style="color: var(--school-blue); text-align: center; text-decoration: underline; font-family: 'Montserrat', sans-serif;">EXAMINATION INSTRUCTIONS</h2>
-                    <ol style="line-height: 2.2; font-size: 15px; margin-top: 15px; color: #000; font-weight: 700; padding-left: 25px; position: relative; z-index: 1;">
-                        <li>On all examination days, students must carry their Admit Card. Without the admit card, entry into the examination hall will not be permitted.</li>
-                        <li>Students must reach the school at least 15 minutes before the reporting time. Late entry after the seating time will not be allowed.</li>
-                        <li>Carrying electronic devices such as mobile phones, smartwatches, calculators, or any other gadgets inside the examination hall is strictly prohibited.</li>
-                        <li>No candidate shall adopt or indulge in unfair means or malpractices during the examination. If found guilty, the candidature will be cancelled and legal action will be taken.</li>
-                        <li>Students must maintain silence and discipline inside the examination hall. Any misconduct will lead to immediate disqualification.</li>
-                        <li>Do not write anything on the question paper or admit card, except where signatures are required.</li>
-                        <li>The admit card must clearly display all student details, the barcode, and the principal's signature. Admit cards without these will not be accepted.</li>
-                        <li>Students must verify all details carefully before printing the admit card. In case of any errors, immediately inform the school administration.</li>
-                    </ol>
-                    <div style="margin-top: auto; position: relative; z-index: 1;">
-                        <div style="text-align: center;"><div class="hash-disp" style="font-family: 'Libre Barcode 39', cursive !important; font-size: 40px; color:#000 !important;">${barcodeID}</div></div>
-                        <div class="page-timestamp-footer">Issued via Admin Portal: ${issuedTime}</div>
-                    </div>
-                </div>
-            `;
+                    `;
 
             // Create hidden render div if it doesn't exist yet
             let renderDiv = document.getElementById('admitCardRender');
