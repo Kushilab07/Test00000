@@ -216,7 +216,7 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6 flex-shrink-0">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 flex-shrink-0">
                 <div
                     class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/30 dark:hover:bg-slate-800/80 cursor-pointer active:scale-[0.98]">
                     <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Students</p>
@@ -293,6 +293,18 @@
                             style="width: 0%"></div>
                     </div>
                 </div>
+
+                                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-[0.98]">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Daily Submission Quota</p>
+                    <div class="flex items-end gap-2 mb-2">
+                        <p id="statSubQuotaUsed" class="text-3xl font-bold text-purple-600 dark:text-purple-400">0</p>
+                        <p class="text-sm font-medium text-slate-500 mb-1">/ 80</p>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 mt-2">
+                        <div id="subQuotaProgressBar" class="bg-purple-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-24 lg:mb-6">
@@ -1168,8 +1180,8 @@
         // ==========================================
         // 1. CONFIGURATION & GLOBALS
         // ==========================================
-        const PENDING_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzz4H4NQ55QsCEquCWlvpJ1YYbK5eoUg-DjojaxyliGIFSOYWZegFFnUF0jISfsv5X_/exec";
-        const FINAL_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZzoZwsNw97dc6FG_mUKUjPsPjn-W483J3LFtv8kbxx30louY1DN7jOefI53mkvUq9rw/exec";
+        const PENDING_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKB7ByhESaS5agxk8bH2ktwirJplSlzRt8ae6c8UV-DRc_3xXVX2AO50nTbAicdDLesg/exec";
+        const FINAL_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyz0IgkDwkmdPbe9aztmO0yAcfP2iJpYcv76UhAPfBqW6rLFjk3b2yLG5fgmARVXQyJng/exec";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBBenVtQ2T7Izy27mCf4anRZrUqibWIpyE",
@@ -2053,6 +2065,26 @@
                         window.emailQuotaDate = fetchedDate;
                     }
                     updateQuotaUI(); // Visually update progress bar
+
+                    // NEW: Sync Student Submission Quota visually
+                    let fSubDate = String(conf.Sub_Quota_Date || '');
+                    if (fSubDate.includes('T')) {
+                        const fsd = new Date(fSubDate);
+                        fSubDate = `${fsd.getFullYear()}-${String(fsd.getMonth() + 1).padStart(2, '0')}-${String(fsd.getDate()).padStart(2, '0')}`;
+                    }
+                    let subCount = (fSubDate === todayStr) ? (parseInt(conf.Sub_Quota_Count) || 0) : 0;
+                    document.getElementById('statSubQuotaUsed').innerText = subCount;
+                    let subPct = (subCount / 80) * 100;
+                    if(subPct > 100) subPct = 100;
+                    document.getElementById('subQuotaProgressBar').style.width = subPct + '%';
+                    
+                    if (subCount >= 80) {
+                        document.getElementById('statSubQuotaUsed').className = "text-3xl font-bold text-red-500";
+                        document.getElementById('subQuotaProgressBar').className = "bg-red-500 h-2 rounded-full transition-all duration-500";
+                    } else {
+                        document.getElementById('statSubQuotaUsed').className = "text-3xl font-bold text-purple-600 dark:text-purple-400";
+                        document.getElementById('subQuotaProgressBar').className = "bg-purple-600 h-2 rounded-full transition-all duration-500";
+                    }
 
                     updateToggleUI('app', conf.Portal_Status || 'OFF', memAppToken, memAppClose);
                     updateToggleUI('admit', conf.Admit_Portal_Status || 'OFF', memAdmitToken, memAdmitClose);
