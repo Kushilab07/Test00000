@@ -1195,7 +1195,14 @@
 
         // --- NEW: QUOTA TRACKING VARIABLES ---
         window.emailQuotaCount = 0;
-        window.emailQuotaDate = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+
+        // Strict Local Timezone Date Generator
+        function getLocalDate() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        window.emailQuotaDate = getLocalDate();
         const MAX_EMAILS = 80;
 
         function updateQuotaUI() {
@@ -2025,8 +2032,15 @@
                     memVerifierPin = conf.Verifier_Pin || '';
 
                     // --- NEW: QUOTA CHECK ON LOAD ---
-                    const todayStr = new Date().toISOString().split('T')[0];
-                    const fetchedDate = conf.Email_Quota_Date || '';
+                    const todayStr = getLocalDate();
+                    let fetchedDate = String(conf.Email_Quota_Date || '');
+
+                    // FIX: Catch Google Sheets auto-converting date strings to Timestamps (e.g. 2026-07-13T18:30:00.000Z)
+                    if (fetchedDate.includes('T')) {
+                        const fd = new Date(fetchedDate);
+                        fetchedDate = `${fd.getFullYear()}-${String(fd.getMonth() + 1).padStart(2, '0')}-${String(fd.getDate()).padStart(2, '0')}`;
+                    }
+
                     let fetchedCount = parseInt(conf.Email_Quota_Count) || 0;
 
                     if (fetchedDate !== todayStr) {
