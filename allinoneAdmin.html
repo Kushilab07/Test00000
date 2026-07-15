@@ -1182,8 +1182,8 @@
         // ==========================================
         // 1. CONFIGURATION & GLOBALS
         // ==========================================
-        const PENDING_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-Qe3KFbQeif7bfBnQL0WXuTOZ65Q4wpMQr_3d2D4DOOurEVOUqXaUEXL33SEVo-ddHQ/exec";
-        const FINAL_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyz0IgkDwkmdPbe9aztmO0yAcfP2iJpYcv76UhAPfBqW6rLFjk3b2yLG5fgmARVXQyJng/exec";
+        const PENDING_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-qhyLW0dIMisVykL5V2dMymqLCCl-B814tSZyvJVbus1MZoDT9oO-ZLAGhEM1WZtVKA/exec";
+        const FINAL_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHPacJqezZU4WQEzzpDfSMctpwHk3Mf8rGAkjyWK_UfESqwy-Tuy1DN_rcZS_BrfBGAA/exec";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBBenVtQ2T7Izy27mCf4anRZrUqibWIpyE",
@@ -1217,7 +1217,7 @@
         }
 
         window.emailQuotaDate = getLocalDate();
-        const MAX_EMAILS = 80;
+        const MAX_EMAILS = 4;
 
         function updateQuotaUI() {
             const quotaText = document.getElementById('statQuotaUsed');
@@ -3235,11 +3235,11 @@
                 
                 if (statSubEl && subProgEl) {
                     statSubEl.innerText = subCount;
-                    let subPct = (subCount / 80) * 100;
+                    let subPct = (subCount / 4) * 100;
                     if(subPct > 100) subPct = 100;
                     subProgEl.style.width = subPct + '%';
                     
-                    if (subCount >= 80) {
+                    if (subCount >= 4) {
                         statSubEl.className = "text-3xl font-bold text-red-500";
                         subProgEl.className = "bg-red-500 h-2 rounded-full transition-all duration-500";
                     } else {
