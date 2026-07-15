@@ -3194,10 +3194,60 @@
                 const admitOn = conf.Admit_Portal_Status === 'ON';
                 const appBadge = document.getElementById('dashAppStatus');
                 const admitBadge = document.getElementById('dashAdmitStatus');
-                appBadge.innerText = appOn ? 'ACTIVE' : 'CLOSED';
-                appBadge.className = appOn ? 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200' : 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-red-100 text-red-700 border border-red-200';
-                admitBadge.innerText = admitOn ? 'ACTIVE' : 'CLOSED';
-                admitBadge.className = admitOn ? 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200' : 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-red-100 text-red-700 border border-red-200';
+                if (appBadge) {
+                    appBadge.innerText = appOn ? 'ACTIVE' : 'CLOSED';
+                    appBadge.className = appOn ? 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200' : 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-red-100 text-red-700 border border-red-200';
+                }
+                if (admitBadge) {
+                    admitBadge.innerText = admitOn ? 'ACTIVE' : 'CLOSED';
+                    admitBadge.className = admitOn ? 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200' : 'px-2 py-0.5 text-[10px] font-bold rounded-md bg-red-100 text-red-700 border border-red-200';
+                }
+
+                // --- NEW: SYNC QUOTAS ON DASHBOARD RELOAD ---
+                const todayStr = typeof getLocalDate === 'function' ? getLocalDate() : new Date().toISOString().split('T')[0];
+                
+                // 1. Admin Review Quota Sync
+                let fetchedDate = String(conf.Email_Quota_Date || '');
+                if (fetchedDate.includes('T')) {
+                    const fd = new Date(fetchedDate);
+                    fetchedDate = `${fd.getFullYear()}-${String(fd.getMonth() + 1).padStart(2, '0')}-${String(fd.getDate()).padStart(2, '0')}`;
+                }
+                let fetchedCount = parseInt(conf.Email_Quota_Count) || 0;
+                if (fetchedDate !== todayStr) {
+                    window.emailQuotaCount = 0;
+                    window.emailQuotaDate = todayStr;
+                    syncQuotaToServer();
+                } else {
+                    window.emailQuotaCount = fetchedCount;
+                    window.emailQuotaDate = fetchedDate;
+                }
+                updateQuotaUI();
+
+                // 2. Student Submission Quota Sync
+                let fSubDate = String(conf.Sub_Quota_Date || '');
+                if (fSubDate.includes('T')) {
+                    const fsd = new Date(fSubDate);
+                    fSubDate = `${fsd.getFullYear()}-${String(fsd.getMonth() + 1).padStart(2, '0')}-${String(fsd.getDate()).padStart(2, '0')}`;
+                }
+                let subCount = (fSubDate === todayStr) ? (parseInt(conf.Sub_Quota_Count) || 0) : 0;
+                const statSubEl = document.getElementById('statSubQuotaUsed');
+                const subProgEl = document.getElementById('subQuotaProgressBar');
+                
+                if (statSubEl && subProgEl) {
+                    statSubEl.innerText = subCount;
+                    let subPct = (subCount / 80) * 100;
+                    if(subPct > 100) subPct = 100;
+                    subProgEl.style.width = subPct + '%';
+                    
+                    if (subCount >= 80) {
+                        statSubEl.className = "text-3xl font-bold text-red-500";
+                        subProgEl.className = "bg-red-500 h-2 rounded-full transition-all duration-500";
+                    } else {
+                        statSubEl.className = "text-3xl font-bold text-purple-600 dark:text-purple-400";
+                        subProgEl.className = "bg-purple-600 h-2 rounded-full transition-all duration-500";
+                    }
+                }
+                // ---------------------------------------------
 
                 const isDark = document.documentElement.classList.contains('dark');
                 const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
