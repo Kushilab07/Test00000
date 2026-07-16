@@ -1221,8 +1221,18 @@
         const STUDENT_MAX = 70;
 
         function updateQuotaUI() {
+            // Check if the Application Portal is currently switched ON
+            const toggleEl = document.getElementById('appPortalToggle');
+            const isPortalOn = toggleEl ? toggleEl.checked : false;
+
             // Dynamic Math
             let dynamicAdminLimit = MASTER_LIMIT - window.subQuotaCount;
+            
+            // NEW: Strict Admin Cap of 10 if the Portal is ON
+            if (isPortalOn) {
+                dynamicAdminLimit = Math.min(10, dynamicAdminLimit);
+            }
+
             let dynamicStudentLimit = Math.min(STUDENT_MAX, MASTER_LIMIT - window.emailQuotaCount);
 
             // 1. Update Admin Review Card
@@ -1840,7 +1850,13 @@
             if (checkedBoxes.length === 0) return;
 
             // --- NEW: DYNAMIC BULK SAFETY LOCK ---
+            const toggleEl = document.getElementById('appPortalToggle');
+            const isPortalOn = toggleEl ? toggleEl.checked : false;
             let dynamicAdminLimit = MASTER_LIMIT - window.subQuotaCount;
+            
+            // Cap at 10 if Portal is ON
+            if (isPortalOn) { dynamicAdminLimit = Math.min(10, dynamicAdminLimit); }
+
             if (window.emailQuotaCount + checkedBoxes.length > dynamicAdminLimit) {
                 const allowed = Math.max(0, dynamicAdminLimit - window.emailQuotaCount);
                 showToast(`Limit Error! You can process ${allowed} more today, but selected ${checkedBoxes.length}.`, 'error');
@@ -2363,6 +2379,12 @@
                 if (saveResult.status !== 'success') throw new Error(saveResult.message || 'Server failed to save config.');
                 showToast('Portal Settings Updated', 'success');
                 updateToggleUI(activeConfigTarget, activeConfigAction, newToken, autoCloseMs);
+                
+                // NEW: Recalculate the Quota bars instantly when portal status changes
+                if (activeConfigTarget === 'app') {
+                    setTimeout(() => { updateQuotaUI(); }, 100);
+                }
+
                 closeModal('portalConfigModal');
             }
             catch (err) {
@@ -2630,7 +2652,13 @@
 
         function handleAction(appId, type) {
             // --- NEW: DYNAMIC SAFETY LOCK ---
+            const toggleEl = document.getElementById('appPortalToggle');
+            const isPortalOn = toggleEl ? toggleEl.checked : false;
             let dynamicAdminLimit = MASTER_LIMIT - window.subQuotaCount;
+            
+            // Cap at 10 if Portal is ON
+            if (isPortalOn) { dynamicAdminLimit = Math.min(10, dynamicAdminLimit); }
+
             if (window.emailQuotaCount >= dynamicAdminLimit) {
                 showToast(`Daily limit reached! The remaining quota is reserved for students or empty.`, 'error');
                 return;
