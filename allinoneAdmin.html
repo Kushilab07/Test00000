@@ -217,9 +217,12 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 flex-shrink-0">
-                <div
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/30 dark:hover:bg-slate-800/80 cursor-pointer active:scale-[0.98]">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Students</p>
+                <div onclick="openStudentsStatsModal()" title="View Class-wise Distribution"
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-blue-400 cursor-pointer active:scale-[0.98] relative group">
+                    <div class="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/5 transition-colors rounded-2xl pointer-events-none"></div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 flex justify-between items-center">
+                        Total Students <i data-lucide="pie-chart" class="w-4 h-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </p>
                     <p id="statTotalStudents" class="text-3xl font-bold text-slate-800 dark:text-white">—</p>
                     <p class="text-xs text-slate-400 mt-1">In the School</p>
                 </div>
@@ -229,9 +232,12 @@
                     <p id="statPending" class="text-3xl font-bold text-amber-500">—</p>
                     <p class="text-xs text-slate-400 mt-1">Awaiting review</p>
                 </div>
-                <div
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/30 dark:hover:bg-slate-800/80 cursor-pointer active:scale-[0.98]">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Admit Cards</p>
+                <div onclick="openAdmitStatsModal()" title="View Admit Card Analytics"
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-amber-400 cursor-pointer active:scale-[0.98] relative group">
+                    <div class="absolute inset-0 bg-amber-500/0 group-hover:bg-amber-500/5 transition-colors rounded-2xl pointer-events-none"></div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex justify-between items-center">
+                        Admit Cards <i data-lucide="donut" class="w-4 h-4 text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </p>
 
                     <!-- We use grid-cols-3 to guarantee exactly equal width for the 3 sections -->
                     <div class="grid grid-cols-3 gap-2 w-full">
@@ -1154,35 +1160,105 @@
             </div>
         </div>
 
+        <!-- TOTAL STUDENTS ANALYTICS MODAL -->
+        <div id="studentsStatsModal" class="fixed inset-0 z-[9999] hidden bg-slate-900/90 backdrop-blur-md flex items-center justify-center opacity-0 transition-opacity duration-300 p-2 sm:p-4">
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col p-4 sm:p-6 relative transform scale-95 transition-transform duration-300">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="users" class="w-6 h-6 text-blue-500"></i> Class-wise Distribution
+                        </h3>
+                        <p class="text-sm text-slate-400 mt-1">Real-time student population analytics</p>
+                    </div>
+                    <button onclick="closeModalCustom('studentsStatsModal')" class="p-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-500 rounded-lg transition-colors border border-slate-700">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                
+                <div class="flex gap-3 mb-6 bg-slate-800/50 p-3 rounded-xl border border-slate-700 items-center">
+                    <label class="text-sm font-medium text-slate-300">Filter Section:</label>
+                    <select id="statSectionFilter" onchange="renderStudentsStatsChart()" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg p-2 focus:outline-none focus:border-blue-500 transition-colors">
+                        <option value="All">All Sections</option>
+                        <option value="MAHA">MAHA</option>
+                        <option value="RISHI">RISHI</option>
+                        <option value="NONE">NONE</option>
+                    </select>
+                </div>
+                
+                <div class="w-full relative bg-slate-950 rounded-xl border border-slate-800 p-4 shadow-inner min-h-[300px] sm:min-h-[400px]">
+                    <canvas id="studentsStatsCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIT CARDS ANALYTICS MODAL -->
+        <div id="admitStatsModal" class="fixed inset-0 z-[9999] hidden bg-slate-900/90 backdrop-blur-md flex items-center justify-center opacity-0 transition-opacity duration-300 p-2 sm:p-4">
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col p-4 sm:p-6 relative transform scale-95 transition-transform duration-300">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="credit-card" class="w-6 h-6 text-amber-500"></i> Admit Status Analytics
+                        </h3>
+                        <p class="text-sm text-slate-400 mt-1">Real-time examination rollout metrics</p>
+                    </div>
+                    <button onclick="closeModalCustom('admitStatsModal')" class="p-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-500 rounded-lg transition-colors border border-slate-700">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                
+                <div class="flex flex-wrap gap-3 mb-6 bg-slate-800/50 p-3 rounded-xl border border-slate-700 items-center">
+                    <select id="admitClassFilter" onchange="renderAdmitStatsChart()" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg p-2 focus:outline-none focus:border-amber-500 flex-1 min-w-[120px]">
+                        <option value="All">All Classes</option>
+                        <option value="1">Class 1</option><option value="2">Class 2</option><option value="3">Class 3</option>
+                        <option value="4">Class 4</option><option value="5">Class 5</option><option value="6">Class 6</option>
+                        <option value="7">Class 7</option><option value="8">Class 8</option><option value="9">Class 9</option>
+                        <option value="10">Class 10</option><option value="11">Class 11</option><option value="12">Class 12</option>
+                    </select>
+                    <select id="admitSectionFilter" onchange="renderAdmitStatsChart()" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg p-2 focus:outline-none focus:border-amber-500 flex-1 min-w-[120px]">
+                        <option value="All">All Sections</option>
+                        <option value="MAHA">MAHA</option>
+                        <option value="RISHI">RISHI</option>
+                        <option value="NONE">NONE</option>
+                    </select>
+                    <button onclick="document.getElementById('admitClassFilter').value='All'; document.getElementById('admitSectionFilter').value='All'; renderAdmitStatsChart();" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium rounded-lg transition-colors border border-slate-600">
+                        Clear Filters
+                    </button>
+                </div>
+                
+                <div class="w-full relative bg-slate-950 rounded-xl border border-slate-800 p-4 shadow-inner min-h-[300px] sm:min-h-[400px] flex justify-center">
+                    <canvas id="admitStatsCanvas" style="max-width: 400px; max-height: 400px;"></canvas>
+                </div>
+            </div>
+        </div>
 
         <!-- PREMIUM REAL-TIME ANALYTICS MODAL -->
-        <div id="analyticsModal" class="fixed inset-0 z-[9999] hidden bg-slate-900/90 backdrop-blur-md flex items-center justify-center opacity-0 transition-opacity duration-300">
-            <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col p-6 m-4 relative overflow-hidden transform scale-95 transition-transform duration-300">
+        <div id="analyticsModal" class="fixed inset-0 z-[9999] hidden bg-slate-900/90 backdrop-blur-md flex items-center justify-center opacity-0 transition-opacity duration-300 p-2 sm:p-4">
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col p-4 sm:p-6 relative overflow-hidden transform scale-95 transition-transform duration-300">
                 
                 <!-- Dark Mode Header -->
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 sm:mb-6 gap-3 sm:gap-4 flex-shrink-0">
                     <div>
-                        <h3 id="analyticsTitle" class="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-                            <i data-lucide="activity" class="w-6 h-6 text-blue-500"></i> Analytics Engine
+                        <h3 id="analyticsTitle" class="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+                            <i data-lucide="activity" class="w-5 h-5 sm:w-6 sm:h-6 text-blue-500"></i> Analytics Engine
                         </h3>
-                        <p class="text-sm text-slate-400 mt-1 flex items-center gap-2">
+                        <p class="text-xs sm:text-sm text-slate-400 mt-1 flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Firebase Telemetry
                         </p>
                     </div>
-                    <div class="flex items-center gap-3 w-full sm:w-auto">
-                        <select id="analyticsScale" onchange="renderAnalyticsChart()" class="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg p-2.5 focus:outline-none focus:border-blue-500 transition-colors shadow-inner flex-1 sm:flex-none cursor-pointer">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
+                        <select id="analyticsScale" onchange="renderAnalyticsChart()" class="bg-slate-800 border border-slate-700 text-white text-xs sm:text-sm rounded-lg p-2 sm:p-2.5 focus:outline-none focus:border-blue-500 transition-colors shadow-inner flex-1 cursor-pointer min-w-[120px]">
                             <option value="24h">24 Hour Window</option>
                             <option value="1h">Last 60 Minutes (Zoom)</option>
                         </select>
-                        <input type="date" id="analyticsDate" onchange="loadFirebaseAnalytics()" class="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg p-2.5 focus:outline-none focus:border-blue-500 [color-scheme:dark] shadow-inner flex-1 sm:flex-none cursor-pointer">
-                        <button onclick="closeAnalyticsModal()" class="p-2.5 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-500 rounded-lg transition-colors border border-slate-700 hover:border-red-500/50">
-                            <i data-lucide="x" class="w-5 h-5"></i>
+                        <input type="date" id="analyticsDate" onchange="loadFirebaseAnalytics()" class="bg-slate-800 border border-slate-700 text-white text-xs sm:text-sm rounded-lg p-2 sm:p-2.5 focus:outline-none focus:border-blue-500 [color-scheme:dark] shadow-inner flex-1 cursor-pointer min-w-[130px]">
+                        <button onclick="closeAnalyticsModal()" class="p-2 sm:p-2.5 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-500 rounded-lg transition-colors border border-slate-700 hover:border-red-500/50 shrink-0">
+                            <i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                         </button>
                     </div>
                 </div>
                 
                 <!-- The Scatter Plot Canvas -->
-                <div class="flex-1 w-full relative bg-slate-950 rounded-xl border border-slate-800 p-4 shadow-inner">
+                <div class="flex-1 w-full relative bg-slate-950 rounded-xl border border-slate-800 p-2 sm:p-4 shadow-inner min-h-[250px]">
                     <canvas id="analyticsCanvas"></canvas>
                 </div>
             </div>
@@ -3564,13 +3640,19 @@
             let submittedPts = [];
             
             rawAnalyticsData.forEach(ev => {
-                // Creates beautiful "Swimlanes" on the Y-Axis
-                let yVal = ev.status === 'Approved' ? 2 : (ev.status === 'Rejected' ? 0 : 1);
-                let pt = { x: ev.timestamp, y: yVal, raw: ev };
-                
-                if(ev.status === 'Approved') approvedPts.push(pt);
-                else if(ev.status === 'Rejected') rejectedPts.push(pt);
-                else submittedPts.push(pt);
+                let yVal, pt;
+                if (currentAnalyticsType === 'reviews') {
+                    // Review mode: Lane 1 (Approved), Lane 0 (Rejected)
+                    yVal = ev.status === 'Approved' ? 1 : 0;
+                    pt = { x: ev.timestamp, y: yVal, raw: ev };
+                    if(ev.status === 'Approved') approvedPts.push(pt);
+                    else if(ev.status === 'Rejected') rejectedPts.push(pt);
+                } else {
+                    // Submission mode: Only Lane 0 (Submitted)
+                    yVal = 0;
+                    pt = { x: ev.timestamp, y: yVal, raw: ev };
+                    submittedPts.push(pt);
+                }
             });
 
             // Calculate Scale boundaries
@@ -3586,27 +3668,33 @@
                 maxX = now;
             }
 
-            // If chart exists, update it smoothly. If not, build it.
-            if (analyticsChart) {
-                analyticsChart.data.datasets[0].data = approvedPts;
-                analyticsChart.data.datasets[1].data = rejectedPts;
-                analyticsChart.data.datasets[2].data = submittedPts;
-                analyticsChart.options.scales.x.min = minX;
-                analyticsChart.options.scales.x.max = maxX;
-                analyticsChart.update('none'); // Snaps instantly for real-time feel
-                return;
+            // --- Dynamic Chart Configuration based on Modal Type ---
+            let yMin = -0.5;
+            let yMax = currentAnalyticsType === 'reviews' ? 1.5 : 0.5;
+            
+            let chartDatasets = [];
+            if (currentAnalyticsType === 'reviews') {
+                chartDatasets = [
+                    { label: 'Approved', data: approvedPts, backgroundColor: '#10b981', borderColor: '#059669', borderWidth: 1, pointRadius: 5, pointHoverRadius: 8 },
+                    { label: 'Rejected', data: rejectedPts, backgroundColor: '#ef4444', borderColor: '#b91c1c', borderWidth: 1, pointRadius: 5, pointHoverRadius: 8 }
+                ];
+            } else {
+                chartDatasets = [
+                    { label: 'Submitted', data: submittedPts, backgroundColor: '#3b82f6', borderColor: '#2563eb', borderWidth: 1, pointRadius: 5, pointHoverRadius: 8 }
+                ];
             }
+
+            // We explicitly destroy the old chart so Chart.js cleanly rebuilds the Y-Axis lines.
+            if (analyticsChart) {
+                analyticsChart.destroy();
+            }
+
+            const isMobile = window.innerWidth < 600;
 
             // Build Premium Dark Theme Scatter Plot
             analyticsChart = new Chart(ctx, {
                 type: 'scatter',
-                data: {
-                    datasets: [
-                        { label: 'Approved', data: approvedPts, backgroundColor: '#10b981', borderColor: '#059669', borderWidth: 1, pointRadius: 6, pointHoverRadius: 9 },
-                        { label: 'Rejected', data: rejectedPts, backgroundColor: '#ef4444', borderColor: '#b91c1c', borderWidth: 1, pointRadius: 6, pointHoverRadius: 9 },
-                        { label: 'Submitted', data: submittedPts, backgroundColor: '#3b82f6', borderColor: '#2563eb', borderWidth: 1, pointRadius: 6, pointHoverRadius: 9 }
-                    ]
-                },
+                data: { datasets: chartDatasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -3619,36 +3707,42 @@
                             grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
                             ticks: {
                                 color: '#94a3b8',
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: isMobile ? 4 : 8, // Less clutter on mobile X-axis
                                 callback: function(val) { return new Date(val).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }
                             }
                         },
                         y: {
-                            min: -0.5,
-                            max: 2.5,
+                            min: yMin,
+                            max: yMax,
                             grid: { color: 'rgba(255,255,255,0.1)', drawBorder: false },
                             ticks: {
                                 color: '#e2e8f0',
-                                font: { weight: 'bold', size: 14, family: "'Inter', sans-serif" },
+                                font: { weight: 'bold', size: isMobile ? 11 : 14, family: "'Inter', sans-serif" },
                                 callback: function(val) {
-                                    if(val === 0) return 'Rejected';
-                                    if(val === 1) return 'Submitted';
-                                    if(val === 2) return 'Approved';
+                                    if (currentAnalyticsType === 'reviews') {
+                                        if(val === 0) return 'Rejected';
+                                        if(val === 1) return 'Approved';
+                                    } else {
+                                        if(val === 0) return 'Submitted';
+                                    }
                                     return '';
                                 }
                             }
                         }
                     },
                     plugins: {
-                        legend: { display: false }, // Hide legend, colors are obvious by lane
+                        legend: { display: false }, 
                         tooltip: {
                             backgroundColor: 'rgba(15, 23, 42, 0.95)',
                             titleColor: '#38bdf8',
                             bodyColor: '#f8fafc',
                             borderColor: '#334155',
                             borderWidth: 1,
-                            padding: 12,
-                            titleFont: { size: 14, family: "'Inter', sans-serif" },
-                            bodyFont: { size: 13, family: "'Inter', sans-serif" },
+                            padding: 10,
+                            titleFont: { size: isMobile ? 12 : 14, family: "'Inter', sans-serif" },
+                            bodyFont: { size: isMobile ? 11 : 13, family: "'Inter', sans-serif" },
                             callbacks: {
                                 label: function(ctx) {
                                     const raw = ctx.raw.raw;
@@ -3657,6 +3751,137 @@
                                 }
                             }
                         }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // 🔴 PREMIUM LOCAL ANALYTICS (Students & Admits)
+        // ==========================================
+        let stdStatsChart = null;
+        let admitStatsChart = null;
+
+        function closeModalCustom(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        // --- STUDENTS MODAL ---
+        function openStudentsStatsModal() {
+            const modal = document.getElementById('studentsStatsModal');
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+            });
+            document.getElementById('statSectionFilter').value = 'All';
+            renderStudentsStatsChart();
+        }
+
+        function renderStudentsStatsChart() {
+            const sectionFilter = document.getElementById('statSectionFilter').value;
+            
+            // Filter local memory instantly
+            let dataToUse = window.finalStudentsData;
+            if (sectionFilter !== 'All') {
+                dataToUse = dataToUse.filter(s => String(s.section).toUpperCase() === sectionFilter);
+            }
+
+            // Group by class (1 to 12)
+            const classCounts = new Array(12).fill(0);
+            dataToUse.forEach(s => {
+                let c = parseInt(s.studentClass);
+                if (c >= 1 && c <= 12) { classCounts[c - 1]++; }
+            });
+
+            const ctx = document.getElementById('studentsStatsCanvas').getContext('2d');
+            
+            if (stdStatsChart) stdStatsChart.destroy();
+            
+            stdStatsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Cls 1','Cls 2','Cls 3','Cls 4','Cls 5','Cls 6','Cls 7','Cls 8','Cls 9','Cls 10','Cls 11','Cls 12'],
+                    datasets: [{
+                        label: 'Students',
+                        data: classCounts,
+                        backgroundColor: '#3b82f6', // Premium Blue
+                        borderRadius: 6,
+                        borderWidth: 0,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { family: "'Inter', sans-serif" } } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', stepSize: 1 } }
+                    }
+                }
+            });
+        }
+
+        // --- ADMIT MODAL ---
+        function openAdmitStatsModal() {
+            const modal = document.getElementById('admitStatsModal');
+            modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+            });
+            document.getElementById('admitClassFilter').value = 'All';
+            document.getElementById('admitSectionFilter').value = 'All';
+            renderAdmitStatsChart();
+        }
+
+        function renderAdmitStatsChart() {
+            const clsFilter = document.getElementById('admitClassFilter').value;
+            const secFilter = document.getElementById('admitSectionFilter').value;
+            
+            // Filter local memory instantly
+            let dataToUse = window.finalStudentsData.filter(s => {
+                const matchCls = clsFilter === 'All' || String(s.studentClass) === clsFilter;
+                const matchSec = secFilter === 'All' || String(s.section).toUpperCase() === secFilter;
+                return matchCls && matchSec;
+            });
+
+            let released = 0; let notReleased = 0; let blocked = 0;
+            dataToUse.forEach(s => {
+                let st = s.admitStatus || 'Not Release';
+                if (st === 'Release') released++;
+                else if (st === 'Block') blocked++;
+                else notReleased++;
+            });
+
+            const ctx = document.getElementById('admitStatsCanvas').getContext('2d');
+            
+            if (admitStatsChart) admitStatsChart.destroy();
+            
+            // Premium Doughnut Chart
+            admitStatsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Released', 'Not Released', 'Blocked'],
+                    datasets: [{
+                        data: [released, notReleased, blocked],
+                        backgroundColor: ['#10b981', '#94a3b8', '#ef4444'], // Green, Grey, Red
+                        borderColor: '#020617', // Match dark bg
+                        borderWidth: 4,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    cutout: '70%', // Makes it a thin, modern ring
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { color: '#e2e8f0', padding: 20, font: { family: "'Inter', sans-serif" }, usePointStyle: true } 
+                        } 
                     }
                 }
             });
