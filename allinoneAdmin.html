@@ -1726,6 +1726,12 @@
                 btn.className = "app-filter-btn flex-1 lg:flex-none px-1.5 sm:px-2 lg:px-4 py-1.5 text-[11px] sm:text-xs lg:text-sm font-medium rounded-lg border border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500";
             });
             btnElement.className = "app-filter-btn flex-1 lg:flex-none px-1.5 sm:px-2 lg:px-4 py-1.5 text-[11px] sm:text-xs lg:text-sm font-medium rounded-lg bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border border-slate-200 dark:border-slate-700 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500";
+            
+            // NEW: Clear all checkboxes and force-hide bulk buttons when changing tabs
+            document.getElementById('selectAllPending').checked = false;
+            document.querySelectorAll('.pending-checkbox').forEach(cb => cb.checked = false);
+            toggleBulkPendingButtons();
+            
             filterPendingTable();
         }
 
@@ -1776,27 +1782,58 @@
         // ==========================================
         // NEW: BULK PENDING PROCESSING CONTROLLERS
         // ==========================================
-        // NEW: Intercepts individual clicks to enforce the limit
+        // NEW: Intercepts individual clicks to enforce dynamic limits
         function handleIndividualPendingCheck(checkbox) {
-            if (currentAppFilter === 'All' || currentAppFilter === 'Pending') {
+            if (currentAppFilter === 'Pending') {
                 const checkedBoxes = document.querySelectorAll('.pending-checkbox:checked');
-                if (checkedBoxes.length > 20) {
+                
+                // --- Calculate Dynamic Selection Limit ---
+                const toggleEl = document.getElementById('appPortalToggle');
+                const isPortalOn = toggleEl ? toggleEl.checked : false;
+                let dynamicAdminLimit = MASTER_LIMIT - window.subQuotaCount;
+                if (isPortalOn) { dynamicAdminLimit = Math.min(10, dynamicAdminLimit); }
+                
+                let remainingQuota = Math.max(0, dynamicAdminLimit - window.emailQuotaCount);
+                let selectLimit = Math.min(20, remainingQuota);
+
+                if (checkedBoxes.length > selectLimit) {
                     checkbox.checked = false; // Immediately uncheck it
-                    showToast('Limit Reached: You can only select up to 20 applications at a time.', 'error');
+                    if (selectLimit === 0) {
+                        showToast('Daily quota exhausted! You cannot select more applications today.', 'error');
+                    } else if (selectLimit < 20) {
+                        showToast(`Quota Limit Reached: You only have ${selectLimit} review(s) left today.`, 'error');
+                    } else {
+                        showToast('Limit Reached: You can only select up to 20 applications at a time.', 'error');
+                    }
                 }
             }
             toggleBulkPendingButtons();
         }
 
-        // UPDATED: "Select All" now respects the tab limit
+        // UPDATED: "Select All" now respects the dynamic tab limit
         function toggleSelectAllPending(source) {
             const checkboxes = document.querySelectorAll('.pending-checkbox');
 
             if (source.checked) {
-                if (currentAppFilter === 'All' || currentAppFilter === 'Pending') {
+                if (currentAppFilter === 'Pending') {
+                    // --- Calculate Dynamic Selection Limit ---
+                    const toggleEl = document.getElementById('appPortalToggle');
+                    const isPortalOn = toggleEl ? toggleEl.checked : false;
+                    let dynamicAdminLimit = MASTER_LIMIT - window.subQuotaCount;
+                    if (isPortalOn) { dynamicAdminLimit = Math.min(10, dynamicAdminLimit); }
+                    
+                    let remainingQuota = Math.max(0, dynamicAdminLimit - window.emailQuotaCount);
+                    let selectLimit = Math.min(20, remainingQuota);
+
+                    if (selectLimit === 0) {
+                        source.checked = false; // Turn off the "Select All" box
+                        showToast('Daily quota exhausted! You cannot select more applications today.', 'error');
+                        return;
+                    }
+
                     let checkedCount = 0;
                     checkboxes.forEach(cb => {
-                        if (checkedCount < 20) {
+                        if (checkedCount < selectLimit) {
                             cb.checked = true;
                             checkedCount++;
                         } else {
@@ -1804,11 +1841,15 @@
                         }
                     });
 
-                    if (checkboxes.length > 20) {
-                        showToast('Auto-limited to the first 20 applications.', 'info');
+                    if (checkboxes.length > selectLimit) {
+                        if (selectLimit < 20) {
+                            showToast(`Auto-limited to ${selectLimit} based on your remaining daily quota.`, 'info');
+                        } else {
+                            showToast('Auto-limited to the first 20 applications.', 'info');
+                        }
                     }
                 } else {
-                    // On Approved or Rejected tabs, select them all without limits
+                    // On All, Approved or Rejected tabs, select them all without limits
                     checkboxes.forEach(cb => cb.checked = true);
                 }
             } else {
@@ -1821,7 +1862,7 @@
 
         function toggleBulkPendingButtons() {
             const anyChecked = document.querySelectorAll('.pending-checkbox:checked').length > 0;
-            const isAllowedTab = (currentAppFilter === 'All' || currentAppFilter === 'Pending');
+            const isAllowedTab = (currentAppFilter === 'Pending'); // NOW STRICTLY ONLY ON PENDING TAB
             const showBulk = anyChecked && isAllowedTab;
 
             document.querySelectorAll('.bulk-pending-btn').forEach(btn => {
@@ -1897,6 +1938,7 @@
             btn.onclick = async function () {
                 btn.disabled = true;
                 let processedCounter = 0;
+                let successCount = 0; // <-- NEW COUNTER
                 const totalCount = checkedBoxes.length;
 
                 for (const cb of checkedBoxes) {
@@ -1942,6 +1984,7 @@
 
                         // --- MOVED: ONLY INCREMENT IF SUCCESSFUL ---
                         window.emailQuotaCount++;
+                        successCount++; // <-- ADD TO COUNTER
                         updateQuotaUI();
 
                     } catch (err) {
@@ -1953,7 +1996,13 @@
                 // --- NEW: SYNC BULK ONCE AT THE END ---
                 syncQuotaToServer();
 
-                showToast(`Successfully processed applications!`, 'info');
+                // --- UX UPDATE: ONLY SHOW IF SUCCESSFUL ---
+                if (successCount === totalCount) {
+                    showToast(`Successfully processed ${successCount} application(s)!`, 'success');
+                } else if (successCount > 0) {
+                    showToast(`Processed ${successCount} successfully, ${totalCount - successCount} failed.`, 'info');
+                }
+
                 btn.disabled = false;
                 closeModal('confirmModal');
                 document.getElementById('selectAllPending').checked = false;
