@@ -281,9 +281,12 @@
                         class="mt-3 w-full text-[10px] font-bold text-blue-600 hover:underline text-left">Manage in
                         Settings →</button>
                 </div>
-                <div
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-[0.98]">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Daily Review Quota</p>
+                <div onclick="openAnalyticsModal('reviews')" title="Click to view Review Analytics"
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-blue-400 cursor-pointer active:scale-[0.98] relative group">
+                    <div class="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/5 transition-colors rounded-2xl pointer-events-none"></div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                        Daily Review Quota <i data-lucide="bar-chart-2" class="w-4 h-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </p>
                     <div class="flex items-end gap-2 mb-2">
                         <p id="statQuotaUsed" class="text-3xl font-bold text-blue-600 dark:text-blue-400">0</p>
                         <p id="statQuotaLimit" class="text-sm font-medium text-slate-500 mb-1">/ 80</p>
@@ -294,9 +297,12 @@
                     </div>
                 </div>
 
-                <div
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-[0.98]">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Daily Application Quota</p>
+                <div onclick="openAnalyticsModal('submissions')" title="Click to view Submission Analytics"
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-purple-400 cursor-pointer active:scale-[0.98] relative group">
+                    <div class="absolute inset-0 bg-purple-500/0 group-hover:bg-purple-500/5 transition-colors rounded-2xl pointer-events-none"></div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+                        Daily Application Quota <i data-lucide="activity" class="w-4 h-4 text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </p>
                     <div class="flex items-end gap-2 mb-2">
                         <p id="statSubQuotaUsed" class="text-3xl font-bold text-purple-600 dark:text-purple-400">0</p>
                         <p id="statSubQuotaLimit" class="text-sm font-medium text-slate-500 mb-1">/ 70</p>
@@ -310,9 +316,10 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-24 lg:mb-6">
-                <div
-                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-                    <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4">Applications — Last 7 Days
+                <div onclick="openAnalyticsModal('submissions')" title="Click for Detailed Timeline"
+                    class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm cursor-pointer hover:border-purple-400 hover:shadow-md transition-all group">
+                    <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4 flex justify-between">
+                        Applications — Last 7 Days <i data-lucide="maximize-2" class="w-4 h-4 text-slate-400 group-hover:text-purple-500"></i>
                     </h3>
                     <div class="relative h-56"><canvas id="chartApplicationsTrend"></canvas></div>
                 </div>
@@ -1144,6 +1151,40 @@
                             class="px-5 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2">Add</button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+
+        <!-- PREMIUM REAL-TIME ANALYTICS MODAL -->
+        <div id="analyticsModal" class="fixed inset-0 z-[9999] hidden bg-slate-900/90 backdrop-blur-md flex items-center justify-center opacity-0 transition-opacity duration-300">
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col p-6 m-4 relative overflow-hidden transform scale-95 transition-transform duration-300">
+                
+                <!-- Dark Mode Header -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <div>
+                        <h3 id="analyticsTitle" class="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+                            <i data-lucide="activity" class="w-6 h-6 text-blue-500"></i> Analytics Engine
+                        </h3>
+                        <p class="text-sm text-slate-400 mt-1 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Firebase Telemetry
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <select id="analyticsScale" onchange="renderAnalyticsChart()" class="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg p-2.5 focus:outline-none focus:border-blue-500 transition-colors shadow-inner flex-1 sm:flex-none cursor-pointer">
+                            <option value="24h">24 Hour Window</option>
+                            <option value="1h">Last 60 Minutes (Zoom)</option>
+                        </select>
+                        <input type="date" id="analyticsDate" onchange="loadFirebaseAnalytics()" class="bg-slate-800 border border-slate-700 text-white text-sm rounded-lg p-2.5 focus:outline-none focus:border-blue-500 [color-scheme:dark] shadow-inner flex-1 sm:flex-none cursor-pointer">
+                        <button onclick="closeAnalyticsModal()" class="p-2.5 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-500 rounded-lg transition-colors border border-slate-700 hover:border-red-500/50">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- The Scatter Plot Canvas -->
+                <div class="flex-1 w-full relative bg-slate-950 rounded-xl border border-slate-800 p-4 shadow-inner">
+                    <canvas id="analyticsCanvas"></canvas>
+                </div>
             </div>
         </div>
     </main>
@@ -1987,6 +2028,15 @@
                         successCount++; // <-- ADD TO COUNTER
                         updateQuotaUI();
 
+                        // 🔴 NEW: FIREBASE TELEMETRY PUSH (Real-Time Dot)
+                        const statusToLog = type === 'approve' ? 'Approved' : 'Rejected';
+                        db.ref('analytics/reviews').push({ 
+                            appId: appId, 
+                            name: studentName, 
+                            status: statusToLog, 
+                            timestamp: Date.now() 
+                        });
+
                     } catch (err) {
                         console.error(`Error with ${appId}:`, err);
                         // Show the EXACT error from the server
@@ -2756,6 +2806,17 @@
                 window.emailQuotaCount++;
                 updateQuotaUI();
                 syncQuotaToServer(); // Fire and forget background save
+
+                // 🔴 NEW: FIREBASE TELEMETRY PUSH (Real-Time Dot)
+                const memData = window.currentApplications.find(r => r.applicationId === pendingAppId);
+                const sName = memData ? memData.studentName : 'Unknown';
+                const statusToLog = pendingAction === 'approve' ? 'Approved' : 'Rejected';
+                db.ref('analytics/reviews').push({ 
+                    appId: pendingAppId, 
+                    name: sName, 
+                    status: statusToLog, 
+                    timestamp: Date.now() 
+                });
                 showToast(`Success!`, 'success'); 
                 closeModal('confirmModal'); 
                 fetchData(); 
@@ -3425,6 +3486,180 @@
                 if (icon) icon.classList.remove('spin');
                 if (btn) btn.disabled = false;
             }
+        }
+
+        // ==========================================
+        // 🔴 PREMIUM FIREBASE ANALYTICS ENGINE (Chart.js)
+        // ==========================================
+        let analyticsChart = null;
+        let rawAnalyticsData = [];
+        let currentAnalyticsType = 'reviews'; 
+        let analyticsRef = null;
+
+        function openAnalyticsModal(type) {
+            currentAnalyticsType = type;
+            const modal = document.getElementById('analyticsModal');
+            modal.classList.remove('hidden');
+            
+            // Animation
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+            });
+
+            // Set UI Titles
+            document.getElementById('analyticsTitle').innerHTML = type === 'reviews' 
+                ? `<i data-lucide="check-square" class="w-6 h-6 text-emerald-500"></i> Admin Review Timeline` 
+                : `<i data-lucide="inbox" class="w-6 h-6 text-purple-500"></i> Student Submission Timeline`;
+            lucide.createIcons({ root: document.getElementById('analyticsTitle') });
+            
+            // Set Date to Today if empty
+            if(!document.getElementById('analyticsDate').value) {
+                document.getElementById('analyticsDate').value = getLocalDate();
+            }
+            
+            loadFirebaseAnalytics();
+        }
+
+        function closeAnalyticsModal() {
+            const modal = document.getElementById('analyticsModal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+            
+            // Stop listening to save memory
+            if(analyticsRef) analyticsRef.off();
+        }
+
+        function loadFirebaseAnalytics() {
+            if(analyticsRef) analyticsRef.off(); 
+            
+            const path = currentAnalyticsType === 'reviews' ? 'analytics/reviews' : 'analytics/submissions';
+            const selectedDate = document.getElementById('analyticsDate').value;
+            
+            // Generate Unix boundaries for the exact day selected
+            const startOfDay = new Date(selectedDate).setHours(0,0,0,0);
+            const endOfDay = new Date(selectedDate).setHours(23,59,59,999);
+            
+            // Firebase Query: ONLY pull data for the selected day! Extremely fast.
+            analyticsRef = db.ref(path).orderByChild('timestamp').startAt(startOfDay).endAt(endOfDay);
+            
+            rawAnalyticsData = []; // Clear old dots
+            
+            // This fires immediately for historical data, AND fires instantly when a new dot is pushed
+            analyticsRef.on('child_added', (snapshot) => {
+                rawAnalyticsData.push(snapshot.val());
+                renderAnalyticsChart(); // Instantly update chart
+            });
+            
+            // Call render once just in case the day is completely empty
+            renderAnalyticsChart();
+        }
+
+        function renderAnalyticsChart() {
+            const ctx = document.getElementById('analyticsCanvas').getContext('2d');
+            
+            let approvedPts = [];
+            let rejectedPts = [];
+            let submittedPts = [];
+            
+            rawAnalyticsData.forEach(ev => {
+                // Creates beautiful "Swimlanes" on the Y-Axis
+                let yVal = ev.status === 'Approved' ? 2 : (ev.status === 'Rejected' ? 0 : 1);
+                let pt = { x: ev.timestamp, y: yVal, raw: ev };
+                
+                if(ev.status === 'Approved') approvedPts.push(pt);
+                else if(ev.status === 'Rejected') rejectedPts.push(pt);
+                else submittedPts.push(pt);
+            });
+
+            // Calculate Scale boundaries
+            const timeScale = document.getElementById('analyticsScale').value;
+            const baseDate = new Date(document.getElementById('analyticsDate').value);
+            
+            let minX = baseDate.setHours(0,0,0,0);
+            let maxX = minX + 86400000; // + 24 hours
+            
+            if (timeScale === '1h') {
+                const now = Date.now();
+                minX = now - 3600000; // - 60 minutes
+                maxX = now;
+            }
+
+            // If chart exists, update it smoothly. If not, build it.
+            if (analyticsChart) {
+                analyticsChart.data.datasets[0].data = approvedPts;
+                analyticsChart.data.datasets[1].data = rejectedPts;
+                analyticsChart.data.datasets[2].data = submittedPts;
+                analyticsChart.options.scales.x.min = minX;
+                analyticsChart.options.scales.x.max = maxX;
+                analyticsChart.update('none'); // Snaps instantly for real-time feel
+                return;
+            }
+
+            // Build Premium Dark Theme Scatter Plot
+            analyticsChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: 'Approved', data: approvedPts, backgroundColor: '#10b981', borderColor: '#059669', borderWidth: 1, pointRadius: 6, pointHoverRadius: 9 },
+                        { label: 'Rejected', data: rejectedPts, backgroundColor: '#ef4444', borderColor: '#b91c1c', borderWidth: 1, pointRadius: 6, pointHoverRadius: 9 },
+                        { label: 'Submitted', data: submittedPts, backgroundColor: '#3b82f6', borderColor: '#2563eb', borderWidth: 1, pointRadius: 6, pointHoverRadius: 9 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 0 }, // Makes live dots pop instantly
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: minX,
+                            max: maxX,
+                            grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(val) { return new Date(val).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); }
+                            }
+                        },
+                        y: {
+                            min: -0.5,
+                            max: 2.5,
+                            grid: { color: 'rgba(255,255,255,0.1)', drawBorder: false },
+                            ticks: {
+                                color: '#e2e8f0',
+                                font: { weight: 'bold', size: 14, family: "'Inter', sans-serif" },
+                                callback: function(val) {
+                                    if(val === 0) return 'Rejected';
+                                    if(val === 1) return 'Submitted';
+                                    if(val === 2) return 'Approved';
+                                    return '';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }, // Hide legend, colors are obvious by lane
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#38bdf8',
+                            bodyColor: '#f8fafc',
+                            borderColor: '#334155',
+                            borderWidth: 1,
+                            padding: 12,
+                            titleFont: { size: 14, family: "'Inter', sans-serif" },
+                            bodyFont: { size: 13, family: "'Inter', sans-serif" },
+                            callbacks: {
+                                label: function(ctx) {
+                                    const raw = ctx.raw.raw;
+                                    const time = new Date(raw.timestamp).toLocaleTimeString();
+                                    return `${raw.appId}  •  ${raw.name}  (${time})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // INIT
