@@ -1182,8 +1182,8 @@
         // ==========================================
         // 1. CONFIGURATION & GLOBALS
         // ==========================================
-        const PENDING_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuNbbRLN_bpvmdq1jsNWEDtvOp04AzufZ9n6eTVL27VBHPLyC-yePtTlPeXSqvEEwleQ/exec";
-        const FINAL_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxGe7CL-YQgnFiRdnS9H7nCN9PsmRHe8p19a8ccZyKZ64NAEsUZBtNIQi2VwJ6S-RpuQ/exec";
+        const PENDING_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcJeBapvw6ye6V2VLu2I3lqlxT6ThqCBEZKFdm1MCEFewyXUrrx3HbH6AMSr0GRhxleg/exec";
+        const FINAL_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvLiUcvJBezhr9raO9VetPK5z54DEJ1mlSC1ITfc1TfATXUU1sPPEYtunSD40P06QT8Q/exec";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBBenVtQ2T7Izy27mCf4anRZrUqibWIpyE",
@@ -1217,8 +1217,8 @@
         }
         window.emailQuotaDate = getLocalDate();
         
-        const MASTER_LIMIT = 5;
-        const STUDENT_MAX = 4;
+        const MASTER_LIMIT = 80;
+        const STUDENT_MAX = 70;
 
         function updateQuotaUI() {
             // Check if the Application Portal is currently switched ON
@@ -1230,7 +1230,7 @@
             
             // NEW: Strict Admin Cap of 10 if the Portal is ON
             if (isPortalOn) {
-                dynamicAdminLimit = Math.min(2, dynamicAdminLimit);
+                dynamicAdminLimit = Math.min(10, dynamicAdminLimit);
             }
 
             let dynamicStudentLimit = Math.min(STUDENT_MAX, MASTER_LIMIT - window.emailQuotaCount);
@@ -1855,7 +1855,7 @@
             let dynamicAdminLimit = MASTER_LIMIT - window.subQuotaCount;
             
             // Cap at 10 if Portal is ON
-            if (isPortalOn) { dynamicAdminLimit = Math.min(2, dynamicAdminLimit); }
+            if (isPortalOn) { dynamicAdminLimit = Math.min(10, dynamicAdminLimit); }
 
             if (window.emailQuotaCount + checkedBoxes.length > dynamicAdminLimit) {
                 const allowed = Math.max(0, dynamicAdminLimit - window.emailQuotaCount);
@@ -2657,7 +2657,7 @@
             let dynamicAdminLimit = MASTER_LIMIT - window.subQuotaCount;
             
             // Cap at 10 if Portal is ON
-            if (isPortalOn) { dynamicAdminLimit = Math.min(2, dynamicAdminLimit); }
+            if (isPortalOn) { dynamicAdminLimit = Math.min(10, dynamicAdminLimit); }
 
             if (window.emailQuotaCount >= dynamicAdminLimit) {
                 showToast(`Daily limit reached! The remaining quota is reserved for students or empty.`, 'error');
