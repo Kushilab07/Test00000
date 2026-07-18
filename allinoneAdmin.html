@@ -1182,7 +1182,7 @@
         // ==========================================
         // 1. CONFIGURATION & GLOBALS
         // ==========================================
-        const PENDING_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcJeBapvw6ye6V2VLu2I3lqlxT6ThqCBEZKFdm1MCEFewyXUrrx3HbH6AMSr0GRhxleg/exec";
+        const PENDING_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxI4k6gkLhPNoHarZqotpXGHgBIhS66q0z3OqXZbV2CJHWczom2n7YwnbUnvTJoqoN/exec";
         const FINAL_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvLiUcvJBezhr9raO9VetPK5z54DEJ1mlSC1ITfc1TfATXUU1sPPEYtunSD40P06QT8Q/exec";
 
         const firebaseConfig = {
@@ -1939,18 +1939,21 @@
                             const rResult = await rRes.json();
                             if (rResult.status !== 'success') throw new Error(rResult.message);
                         }
+
+                        // --- MOVED: ONLY INCREMENT IF SUCCESSFUL ---
+                        window.emailQuotaCount++;
+                        updateQuotaUI();
+
                     } catch (err) {
                         console.error(`Error with ${appId}:`, err);
-                        showToast(`Failed to process: ${appId}`, 'error');
+                        // Show the EXACT error from the server
+                        showToast(err.message || `Failed to process: ${appId}`, 'error');
                     }
-                    // --- NEW: INCREMENT QUOTA ---
-                    window.emailQuotaCount++;
-                    updateQuotaUI();
                 }
                 // --- NEW: SYNC BULK ONCE AT THE END ---
                 syncQuotaToServer();
 
-                showToast(`Successfully processed applications!`, 'success');
+                showToast(`Successfully processed applications!`, 'info');
                 btn.disabled = false;
                 closeModal('confirmModal');
                 document.getElementById('selectAllPending').checked = false;
@@ -2704,8 +2707,18 @@
                 window.emailQuotaCount++;
                 updateQuotaUI();
                 syncQuotaToServer(); // Fire and forget background save
-                showToast(`Success!`, 'success'); closeModal('confirmModal'); fetchData(); fetchFinalStudents();
-            } catch (e) { showToast('Error processing', 'error'); } finally { btn.disabled = false; btn.innerHTML = origText; }
+                showToast(`Success!`, 'success'); 
+                closeModal('confirmModal'); 
+                fetchData(); 
+                fetchFinalStudents();
+            } catch (e) { 
+                // Show exact error from server instead of generic message
+                showToast(e.message || 'Error processing', 'error'); 
+                closeModal('confirmModal'); // Force close modal on error too
+            } finally { 
+                btn.disabled = false; 
+                btn.innerHTML = origText; 
+            }
         }
 
         // ADMIT STATUS MODAL
