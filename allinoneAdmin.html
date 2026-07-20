@@ -2108,7 +2108,7 @@
                         const statusToLog = type === 'approve' ? 'Approved' : 'Rejected';
                         db.ref('analytics/reviews').push({ 
                             appId: appId, 
-                            name: studentName, 
+                            name: data.studentName, 
                             status: statusToLog, 
                             timestamp: Date.now() 
                         });
