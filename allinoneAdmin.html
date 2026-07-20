@@ -1166,9 +1166,9 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-                            <i data-lucide="users" class="w-6 h-6 text-blue-500"></i> Class-wise Distribution
+                            <i data-lucide="users" class="w-6 h-6 text-blue-500"></i> Total Students : <span id="statTotalStudents" class="text-3xl font-bold text-slate-800 dark:text-white">—</span>
                         </h3>
-                        <p class="text-sm text-slate-400 mt-1">Real-time student population analytics</p>
+                        <p class="text-sm text-slate-400 mt-1">Class-wise Distribution</p>
                     </div>
                     <button onclick="closeModalCustom('studentsStatsModal')" class="p-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-500 rounded-lg transition-colors border border-slate-700">
                         <i data-lucide="x" class="w-5 h-5"></i>
@@ -1176,7 +1176,7 @@
                 </div>
                 
                 <div class="flex gap-3 mb-6 bg-slate-800/50 p-3 rounded-xl border border-slate-700 items-center">
-                    <label class="text-sm font-medium text-slate-300">Filter Section:</label>
+                    <label class="text-sm font-medium text-slate-300">Section:</label>
                     <select id="statSectionFilter" onchange="renderStudentsStatsChart()" class="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg p-2 focus:outline-none focus:border-blue-500 transition-colors">
                         <option value="All">All Sections</option>
                         <option value="MAHA">MAHA</option>
@@ -1199,7 +1199,7 @@
                         <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
                             <i data-lucide="credit-card" class="w-6 h-6 text-amber-500"></i> Admit Status Analytics
                         </h3>
-                        <p class="text-sm text-slate-400 mt-1">Real-time examination rollout metrics</p>
+                        <p class="text-sm text-slate-400 mt-1">Examination rollout metrics</p>
                     </div>
                     <button onclick="closeModalCustom('admitStatsModal')" class="p-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-500 rounded-lg transition-colors border border-slate-700">
                         <i data-lucide="x" class="w-5 h-5"></i>
@@ -1242,13 +1242,13 @@
                             <i data-lucide="activity" class="w-5 h-5 sm:w-6 sm:h-6 text-blue-500"></i> Analytics Engine
                         </h3>
                         <p class="text-xs sm:text-sm text-slate-400 mt-1 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Firebase Telemetry
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live
                         </p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
                         <select id="analyticsScale" onchange="renderAnalyticsChart()" class="bg-slate-800 border border-slate-700 text-white text-xs sm:text-sm rounded-lg p-2 sm:p-2.5 focus:outline-none focus:border-blue-500 transition-colors shadow-inner flex-1 cursor-pointer min-w-[120px]">
                             <option value="24h">24 Hour Window</option>
-                            <option value="1h">Last 60 Minutes (Zoom)</option>
+                            <option value="1h">Last 60 Minutes</option>
                         </select>
                         <input type="date" id="analyticsDate" onchange="loadFirebaseAnalytics()" class="bg-slate-800 border border-slate-700 text-white text-xs sm:text-sm rounded-lg p-2 sm:p-2.5 focus:outline-none focus:border-blue-500 [color-scheme:dark] shadow-inner flex-1 cursor-pointer min-w-[130px]">
                         <button onclick="closeAnalyticsModal()" class="p-2 sm:p-2.5 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-500 rounded-lg transition-colors border border-slate-700 hover:border-red-500/50 shrink-0">
@@ -2951,7 +2951,7 @@
                     throw new Error(result.message);
                 }
             } catch (err) {
-                showToast('Warning: Failed to save to Google Sheets.', 'error');
+                showToast('Warning: Failed to save to database.', 'error');
             }
         }
 
@@ -2960,7 +2960,7 @@
             e.preventDefault(); const btn = document.getElementById('addStudentBtn'); btn.disabled = true; btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 spin"></i> Saving...`; lucide.createIcons({ root: btn });
             // FIX: Token added
             const payload = { action: 'add_student', token: ADMIN_SECRET, studentName: document.getElementById('addName').value, studentClass: document.getElementById('addClass').value, section: document.getElementById('addSection').value, rollNo: document.getElementById('addRoll').value, dob: document.getElementById('addDob').value, fatherName: document.getElementById('addFather').value, phone: document.getElementById('addPhone').value, email: document.getElementById('addEmail').value, admitStatus: document.getElementById('addStatus').value };
-            try { await fetch(FINAL_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }); showToast('Student Added & Email Sent!', 'success'); closeModal('addStudentModal'); fetchFinalStudents(); }
+            try { await fetch(FINAL_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) }); showToast('Student Added.', 'success'); closeModal('addStudentModal'); fetchFinalStudents(); }
             catch (err) { showToast('Add failed', 'error'); } finally { btn.disabled = false; btn.innerHTML = 'Add'; }
         }
 
@@ -2987,14 +2987,29 @@
             document.getElementById('confirmIcon').setAttribute('data-lucide', 'alert-triangle');
             document.getElementById('confirmTitle').innerText = "DANGER: Delete";
             document.getElementById('confirmAppId').innerText = "ALL RECORDS";
-            document.getElementById('confirmMessage').innerText = `Are you absolutely sure you want to delete all records from the ${type === 'pending' ? 'Applications Database' : 'Students Database'}? This action cannot be undone.`;
+            document.getElementById('confirmMessage').innerText = `Are you absolutely sure you want to delete all records from the ${type === 'pending' ? 'Applications Database' : 'Students Database & All'}? This action cannot be undone.`;
             const btn = document.getElementById('confirmExecuteBtn'); btn.className = "px-5 py-2.5 rounded-xl font-medium text-white shadow-sm flex items-center gap-2 bg-red-800 hover:bg-red-900 transition-colors"; btn.innerHTML = `Wipe Database`;
             btn.onclick = async function () {
                 btn.disabled = true; btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 spin"></i> Deleting...`; lucide.createIcons({ root: btn });
                 const url = universalDeleteType === 'pending' ? PENDING_SCRIPT_URL : FINAL_SCRIPT_URL;
                 const act = universalDeleteType === 'pending' ? 'delete_all_pending' : 'delete_all_final';
-                // FIX: Token added
-                try { await fetch(url, { method: 'POST', body: JSON.stringify({ action: act, token: ADMIN_SECRET }) }); showToast('Database wiped', 'success'); closeModal('confirmModal'); if (universalDeleteType === 'pending') fetchData(); else fetchFinalStudents(); }
+                
+                try { 
+                    // 1. Wipe Google Sheets Data
+                    await fetch(url, { method: 'POST', body: JSON.stringify({ action: act, token: ADMIN_SECRET }) }); 
+                    
+                    // 2. 🔴 FIREBASE WIPE: Instantly clear telemetry and notifications
+                    if (universalDeleteType === 'pending') {
+                        await db.ref('notifications').remove();
+                        await db.ref('analytics').remove();
+                    }
+
+                    showToast('Database  Wiped!', 'success'); 
+                    closeModal('confirmModal'); 
+                    
+                    if (universalDeleteType === 'pending') fetchData(); 
+                    else fetchFinalStudents(); 
+                }
                 catch (e) { showToast('Delete failed', 'error'); } finally { btn.disabled = false; }
             }; openModal('confirmModal');
         }
@@ -3130,7 +3145,7 @@
                 }
                 if (!hasExams) rows = `<tr><td colspan="4" style="color:red; text-align:center; padding: 20px;">Routine is empty. Please add subjects in Settings.</td></tr>`;
             } else {
-                rows = `<tr><td colspan="4" style="color:red; text-align:center; padding: 20px;">No Routine found for Class ${data.studentClass} (${examType}). Please add it in the Settings Tab.</td></tr>`;
+                rows = `<tr><td colspan="4" style="color:red; text-align:center; padding: 20px;">No Routine found for Class ${data.studentClass} (${examType}). Please add it in the Settings.</td></tr>`;
             }
 
             // Using the EXACT HTML Template provided in your code
@@ -3586,7 +3601,7 @@
             // Set UI Titles
             document.getElementById('analyticsTitle').innerHTML = type === 'reviews' 
                 ? `<i data-lucide="check-square" class="w-6 h-6 text-emerald-500"></i> Admin Review Timeline` 
-                : `<i data-lucide="inbox" class="w-6 h-6 text-purple-500"></i> Student Submission Timeline`;
+                : `<i data-lucide="inbox" class="w-6 h-6 text-purple-500"></i> Application Submission Timeline`;
             lucide.createIcons({ root: document.getElementById('analyticsTitle') });
             
             // Set Date to Today if empty
